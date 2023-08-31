@@ -1,7 +1,7 @@
-import {useRef} from 'react';
+import { useRef } from "react";
 
 export default function useThrottle(fn: Function, delay: number = 300) {
-  const {current} = useRef<{timer?: NodeJS.Timeout}>({});
+  const { current } = useRef<{ timer?: NodeJS.Timeout | number }>({});
   return function (this: any, ...args: any[]) {
     if (!current.timer) {
       current.timer = setTimeout(() => {
