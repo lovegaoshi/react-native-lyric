@@ -1,11 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useRef, useImperativeHandle, useEffect, useMemo} from 'react';
-import {ScrollView, StyleProp, Text, View, ViewStyle} from 'react-native';
+import React, { useRef, useImperativeHandle, useEffect, useMemo } from "react";
+import { ScrollView, StyleProp, Text, View, ViewStyle } from "react-native";
 
-import {LrcLine, AUTO_SCROLL_AFTER_USER_SCROLL} from '../constant';
-import useLrc from '../util/use_lrc';
-import useCurrentIndex from './use_current_index';
-import useLocalAutoScroll from './use_local_auto_scroll';
+import { LrcLine, AUTO_SCROLL_AFTER_USER_SCROLL } from "../constant";
+import useLrc from "../util/use_lrc";
+import useCurrentIndex from "./use_current_index";
+import useLocalAutoScroll from "./use_local_auto_scroll";
 
 interface Props {
   /** lrc string */
@@ -38,6 +38,7 @@ interface Props {
   height: number;
   lineHeight: number;
   activeLineHeight: number;
+  noScrollThrottle?: boolean;
   [key: string]: any;
 }
 
@@ -54,15 +55,16 @@ const Lrc = React.forwardRef<
 >(function Lrc(
   {
     lrc,
-    lineRenderer = ({lrcLine: {content}, active}) => (
+    lineRenderer = ({ lrcLine: { content }, active }) => (
       <Text
         style={{
-          textAlign: 'center',
-          color: active ? 'white' : 'gray',
+          textAlign: "center",
+          color: active ? "white" : "gray",
           fontSize: active ? 16 : 13,
           opacity: active ? 1 : 0.4,
-          fontWeight: active ? '500' : '400',
-        }}>
+          fontWeight: active ? "500" : "400",
+        }}
+      >
         {content}
       </Text>
     ),
@@ -74,22 +76,24 @@ const Lrc = React.forwardRef<
     onCurrentLineChange,
     height = 500,
     style,
+    noScrollThrottle,
     ...props
   }: Props,
-  ref,
+  ref
 ) {
   const lrcRef = useRef<ScrollView>(null);
   const lrcLineList = useLrc(lrc);
 
-  const currentIndex = useCurrentIndex({lrcLineList, currentTime});
-  const {localAutoScroll, resetLocalAutoScroll, onScroll} = useLocalAutoScroll({
-    autoScroll,
-    autoScrollAfterUserScroll,
-  });
+  const currentIndex = useCurrentIndex({ lrcLineList, currentTime });
+  const { localAutoScroll, resetLocalAutoScroll, onScroll } =
+    useLocalAutoScroll({
+      autoScroll,
+      autoScrollAfterUserScroll,
+    });
 
   // auto scroll
   useEffect(() => {
-    if (localAutoScroll) {
+    if (noScrollThrottle || localAutoScroll) {
       lrcRef.current?.scrollTo({
         y: currentIndex * lineHeight || 0,
         animated: true,
@@ -126,11 +130,12 @@ const Lrc = React.forwardRef<
           key={lrcLine.id}
           style={{
             height: currentIndex === index ? activeLineHeight : lineHeight,
-          }}>
-          {lineRenderer({lrcLine, index, active: currentIndex === index})}
+          }}
+        >
+          {lineRenderer({ lrcLine, index, active: currentIndex === index })}
         </View>
       )),
-    [activeLineHeight, currentIndex, lineHeight, lineRenderer, lrcLineList],
+    [activeLineHeight, currentIndex, lineHeight, lineRenderer, lrcLineList]
   );
   return (
     <ScrollView
@@ -138,14 +143,15 @@ const Lrc = React.forwardRef<
       ref={lrcRef}
       scrollEventThrottle={30}
       onScroll={onScroll}
-      style={[style, {height}]}>
+      style={[style, { height }]}
+    >
       <View>
         {autoScroll ? (
-          <View style={{width: '100%', height: 0.45 * height}} />
+          <View style={{ width: "100%", height: 0.45 * height }} />
         ) : null}
         {lyricNodeList}
         {autoScroll ? (
-          <View style={{width: '100%', height: 0.5 * height}} />
+          <View style={{ width: "100%", height: 0.5 * height }} />
         ) : null}
       </View>
     </ScrollView>
