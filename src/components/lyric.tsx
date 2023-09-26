@@ -4,7 +4,6 @@ import {
   ScrollView,
   StyleProp,
   Text,
-  TouchableWithoutFeedback,
   View,
   ViewStyle,
 } from "react-native";
@@ -92,6 +91,7 @@ const Lrc = React.forwardRef<
 ) {
   const lrcRef = useRef<ScrollView>(null);
   const lrcLineList = useLrc(lrc);
+  const scrolled = useRef(false);
 
   const currentIndex = useCurrentIndex({ lrcLineList, currentTime });
   const { localAutoScroll, resetLocalAutoScroll, onScroll } =
@@ -153,18 +153,19 @@ const Lrc = React.forwardRef<
       scrollEventThrottle={30}
       onScroll={onScroll}
       style={[style, { height }]}
+      onScrollBeginDrag={() => scrolled.current = true}
+      onScrollEndDrag={() => scrolled.current = false}
+      onTouchEnd={() => !scrolled.current && onPress?.()}
     >
-      <TouchableWithoutFeedback onPress={onPress}>
-        <View>
-          {autoScroll ? (
-            <View style={{ width: "100%", height: 0.45 * height }} />
-          ) : null}
-          {lyricNodeList}
-          {autoScroll ? (
-            <View style={{ width: "100%", height: 0.5 * height }} />
-          ) : null}
-        </View>
-      </TouchableWithoutFeedback>
+      <View>
+        {autoScroll ? (
+          <View style={{ width: "100%", height: 0.45 * height }} />
+        ) : null}
+        {lyricNodeList}
+        {autoScroll ? (
+          <View style={{ width: "100%", height: 0.5 * height }} />
+        ) : null}
+      </View>
     </ScrollView>
   );
 });
