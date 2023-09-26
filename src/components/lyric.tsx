@@ -1,6 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useRef, useImperativeHandle, useEffect, useMemo } from "react";
-import { ScrollView, StyleProp, Text, View, ViewStyle } from "react-native";
+import {
+  ScrollView,
+  StyleProp,
+  Text,
+  TouchableWithoutFeedback,
+  View,
+  ViewStyle,
+} from "react-native";
 
 import { LrcLine, AUTO_SCROLL_AFTER_USER_SCROLL } from "../constant";
 import useLrc from "../util/use_lrc";
@@ -39,6 +46,7 @@ interface Props {
   lineHeight: number;
   activeLineHeight: number;
   noScrollThrottle?: boolean;
+  onPress?: () => void;
   [key: string]: any;
 }
 
@@ -77,6 +85,7 @@ const Lrc = React.forwardRef<
     height = 500,
     style,
     noScrollThrottle,
+    onPress,
     ...props
   }: Props,
   ref
@@ -145,15 +154,17 @@ const Lrc = React.forwardRef<
       onScroll={onScroll}
       style={[style, { height }]}
     >
-      <View>
-        {autoScroll ? (
-          <View style={{ width: "100%", height: 0.45 * height }} />
-        ) : null}
-        {lyricNodeList}
-        {autoScroll ? (
-          <View style={{ width: "100%", height: 0.5 * height }} />
-        ) : null}
-      </View>
+      <TouchableWithoutFeedback onPress={onPress}>
+        <View>
+          {autoScroll ? (
+            <View style={{ width: "100%", height: 0.45 * height }} />
+          ) : null}
+          {lyricNodeList}
+          {autoScroll ? (
+            <View style={{ width: "100%", height: 0.5 * height }} />
+          ) : null}
+        </View>
+      </TouchableWithoutFeedback>
     </ScrollView>
   );
 });
