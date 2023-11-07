@@ -1,12 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useRef, useImperativeHandle, useEffect, useMemo } from "react";
-import {
-  ScrollView,
-  StyleProp,
-  Text,
-  View,
-  ViewStyle,
-} from "react-native";
+import { ScrollView, StyleProp, Text, View, ViewStyle } from "react-native";
 
 import { LrcLine, AUTO_SCROLL_AFTER_USER_SCROLL } from "../constant";
 import useLrc from "../util/use_lrc";
@@ -90,6 +84,7 @@ const Lrc = React.forwardRef<
   ref
 ) {
   const lrcRef = useRef<ScrollView>(null);
+  const locationX = useRef(0);
   const lrcLineList = useLrc(lrc);
   const scrolled = useRef(false);
 
@@ -153,9 +148,14 @@ const Lrc = React.forwardRef<
       scrollEventThrottle={30}
       onScroll={onScroll}
       style={[style, { height }]}
-      onScrollBeginDrag={() => scrolled.current = true}
-      onScrollEndDrag={() => scrolled.current = false}
-      onTouchEnd={() => !scrolled.current && onPress?.()}
+      onScrollBeginDrag={() => (scrolled.current = true)}
+      onScrollEndDrag={() => (scrolled.current = false)}
+      onTouchStart={(e) => (locationX.current = e.nativeEvent.locationX)}
+      onTouchEnd={(e) =>
+        Math.abs(locationX.current - e.nativeEvent.locationX) < 5 &&
+        !scrolled.current &&
+        onPress?.()
+      }
     >
       <View>
         {autoScroll ? (
