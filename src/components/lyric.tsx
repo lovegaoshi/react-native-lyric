@@ -144,6 +144,7 @@ const Lrc = React.forwardRef<
   return (
     <ScrollView
       {...props}
+      showsVerticalScrollIndicator={false}
       ref={lrcRef}
       scrollEventThrottle={30}
       onScroll={onScroll}
