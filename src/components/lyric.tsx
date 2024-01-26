@@ -151,6 +151,7 @@ const Lrc = React.forwardRef<
       style={[style, { height }]}
       onScrollBeginDrag={() => (scrolled.current = true)}
       onScrollEndDrag={() => (scrolled.current = false)}
+      onMomentumScrollEnd={() => (scrolled.current = false)}
       onTouchStart={(e) => (locationX.current = e.nativeEvent.locationX)}
       onTouchEnd={(e) =>
         Math.abs(locationX.current - e.nativeEvent.locationX) < 5 &&
