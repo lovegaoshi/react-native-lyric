@@ -39,6 +39,7 @@ interface Props {
   lineHeight: number;
   activeLineHeight: number;
   noScrollThrottle?: boolean;
+  showUnformatted?: boolean;
   onPress?: () => void;
   [key: string]: any;
 }
@@ -78,6 +79,7 @@ const Lrc = React.forwardRef<
     height = 500,
     style,
     noScrollThrottle,
+    showUnformatted = true,
     onPress,
     ...props
   }: Props,
@@ -85,7 +87,7 @@ const Lrc = React.forwardRef<
 ) {
   const lrcRef = useRef<ScrollView>(null);
   const locationX = useRef(0);
-  const lrcLineList = useLrc(lrc);
+  const lrcLineList = useLrc(lrc, showUnformatted);
   const scrolled = useRef(false);
 
   const currentIndex = useCurrentIndex({ lrcLineList, currentTime });
