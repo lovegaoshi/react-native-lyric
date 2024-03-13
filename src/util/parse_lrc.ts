@@ -31,13 +31,11 @@ export default (lrc: string, showUnformatted = true): LrcLine[] => {
     }
   }
   const sortedLrcs = lrcLineList.sort((a, b) => a.millisecond - b.millisecond);
-  return showUnformatted
-    ? unformattedLrc
-        .map((content) => ({
-          id: getRandomString(),
-          millisecond: 0,
-          content,
-        }))
-        .concat(sortedLrcs)
+  return showUnformatted && sortedLrcs.length === 0
+    ? unformattedLrc.map((content) => ({
+        id: getRandomString(),
+        millisecond: 0,
+        content,
+      }))
     : sortedLrcs;
 };
