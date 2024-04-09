@@ -4,6 +4,8 @@ lyric,lrc,karaoke
 
 Demo app
 
+`cd example; yarn; yarn android`
+
 <p align="center">
 <img src="/introl.gif" height="500" />
 </p>
