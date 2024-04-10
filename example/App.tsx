@@ -57,6 +57,7 @@ export default function App() {
         currentTime={currentMillisecond}
         autoScroll
         autoScrollAfterUserScroll={500}
+        useMaskedView={true}
       />
     </View>
   );

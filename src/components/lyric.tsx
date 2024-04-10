@@ -85,7 +85,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     noScrollThrottle,
     showUnformatted = true,
     onPress,
-    useMaskedView = true,
+    useMaskedView = false,
     ...props
   }: Props,
   ref
@@ -165,7 +165,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
                 width: `${
                   ((currentTime - lrcLine.millisecond) / lrcLine.duration) * 100
                 }%`,
-                backgroundColor: "red",
+                backgroundColor: "white",
               }}
             />
             <View
@@ -174,7 +174,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
                   (1 - (currentTime - lrcLine.millisecond) / lrcLine.duration) *
                   100
                 }%`,
-                backgroundColor: "white",
+                backgroundColor: "gray",
               }}
             />
           </>
