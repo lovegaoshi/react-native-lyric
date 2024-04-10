@@ -16,10 +16,12 @@ interface Props {
     lrcLine,
     index,
     active,
+    color,
   }: {
     lrcLine: LrcLine;
     index: number;
     active: boolean;
+    color?: string;
   }) => React.ReactNode;
   /** audio currentTime, millisecond */
   currentTime?: number;
@@ -42,6 +44,7 @@ interface Props {
   noScrollThrottle?: boolean;
   showUnformatted?: boolean;
   onPress?: () => void;
+  useMaskedView?: boolean;
   [key: string]: any;
 }
 
@@ -56,10 +59,11 @@ interface LrcProps {
 const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   {
     lrc,
-    lineRenderer = ({ lrcLine: { content }, active }) => (
+    lineRenderer = ({ lrcLine: { content }, active, color }) => (
       <Text
         style={{
           textAlign: "center",
+          color,
           fontSize: active ? 16 : 13,
           opacity: active ? 1 : 0.4,
           fontWeight: active ? "500" : "400",
@@ -79,6 +83,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     noScrollThrottle,
     showUnformatted = true,
     onPress,
+    useMaskedView = true,
     ...props
   }: Props,
   ref
@@ -128,29 +133,53 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     },
   }));
 
+  const maskedLrcLine = (lrcLine: LrcLine, index: number) => {
+    return (
+      <MaskedView
+        key={lrcLine.id}
+        style={{
+          height: currentIndex === index ? activeLineHeight : lineHeight,
+        }}
+        androidRenderingMode={"software"}
+        maskElement={lineRenderer({
+          lrcLine,
+          index,
+          active: currentIndex === index,
+        })}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: currentIndex === index ? "white" : "gray",
+          }}
+        />
+      </MaskedView>
+    );
+  };
+
+  const standardLrcLine = (lrcLine: LrcLine, index: number) => (
+    <View
+      key={lrcLine.id}
+      style={{
+        height: currentIndex === index ? activeLineHeight : lineHeight,
+      }}
+    >
+      {lineRenderer({
+        lrcLine,
+        index,
+        active: currentIndex === index,
+        color: currentIndex === index ? "white" : "gray",
+      })}
+    </View>
+  );
+
   const lyricNodeList = useMemo(
     () =>
-      lrcLineList.map((lrcLine, index) => (
-        <MaskedView
-          key={lrcLine.id}
-          style={{
-            height: currentIndex === index ? activeLineHeight : lineHeight,
-          }}
-          maskElement={lineRenderer({
-            lrcLine,
-            index,
-            active: currentIndex === index,
-          })}
-        >
-          <View
-            style={{
-              flex: 1,
-              height: "100%",
-              backgroundColor: "gray",
-            }}
-          />
-        </MaskedView>
-      )),
+      lrcLineList.map((lrcLine, index) =>
+        useMaskedView
+          ? maskedLrcLine(lrcLine, index)
+          : standardLrcLine(lrcLine, index)
+      ),
     [activeLineHeight, currentIndex, lineHeight, lineRenderer, lrcLineList]
   );
   return (
