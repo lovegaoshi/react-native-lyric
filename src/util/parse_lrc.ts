@@ -39,6 +39,6 @@ export default (lrc: string, showUnformatted = true): LrcLine[] => {
       }))
     : sortedLrcs.map((lrcLine, i) => ({
       ...lrcLine,
-      nextMilisecond: lrcLineList[i + 1]?.millisecond,
+      duration: lrcLineList[i + 1]?.millisecond - lrcLine.millisecond,
     }));
 };

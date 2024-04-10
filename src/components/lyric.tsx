@@ -151,12 +151,41 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
           active: currentIndex === index,
         })}
       >
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: currentIndex === index ? "white" : "gray",
-          }}
-        />
+        {currentIndex !== index ? (
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "gray",
+            }}
+          />
+        ) : lrcLine.duration ? (
+          <>
+            <View
+              style={{
+                width: `${
+                  ((currentTime - lrcLine.millisecond) / lrcLine.duration) * 100
+                }%`,
+                backgroundColor: "red",
+              }}
+            />
+            <View
+              style={{
+                width: `${
+                  (1 - (currentTime - lrcLine.millisecond) / lrcLine.duration) *
+                  100
+                }%`,
+                backgroundColor: "white",
+              }}
+            />
+          </>
+        ) : (
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "white",
+            }}
+          />
+        )}
       </MaskedView>
     );
   };
