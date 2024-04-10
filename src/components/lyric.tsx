@@ -62,11 +62,13 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     lineRenderer = ({ lrcLine: { content }, active, color }) => (
       <Text
         style={{
+          flex: 1,
           textAlign: "center",
           color,
           fontSize: active ? 16 : 13,
           opacity: active ? 1 : 0.4,
           fontWeight: active ? "500" : "400",
+          // width: "100%",
         }}
       >
         {content}
@@ -138,6 +140,8 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
       <MaskedView
         key={lrcLine.id}
         style={{
+          flex: 1,
+          flexDirection: "row",
           height: currentIndex === index ? activeLineHeight : lineHeight,
         }}
         androidRenderingMode={"software"}
@@ -200,7 +204,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
         onPress?.()
       }
     >
-      <View>
+      <View style={{ flex: 1 }}>
         {autoScroll ? (
           <View style={{ width: "100%", height: 0.45 * height }} />
         ) : null}

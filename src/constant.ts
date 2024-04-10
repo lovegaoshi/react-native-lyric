@@ -4,4 +4,5 @@ export interface LrcLine {
   id: string;
   millisecond: number;
   content: string;
+  nextMilisecond?: number;
 }

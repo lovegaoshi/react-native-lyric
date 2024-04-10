@@ -6,7 +6,7 @@ import Constants from "expo-constants";
 import { Lrc } from "./src/index";
 import useTimer from "./time";
 const lrc = `
-[00:00.00]Dreamers 
+[00:00.00]Dreamers Dreamers Dreamers Dreamers Dreamers Dreamers Dreamers Dreamers Dreamers Dreamers Dreamers Dreamers Dreamers 
 [00:04.43]Jungkook BTS
 [00:09.11]
 [00:09.61] ....
