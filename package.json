@@ -46,5 +46,8 @@
   "peerDependencies": {
     "react": "*",
     "react-native": "*"
+  },
+  "dependencies": {
+    "@react-native-masked-view/masked-view": "^0.3.1"
   }
 }

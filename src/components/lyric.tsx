@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useRef, useImperativeHandle, useEffect, useMemo } from "react";
 import { ScrollView, StyleProp, Text, View, ViewStyle } from "react-native";
+import MaskedView from "@react-native-masked-view/masked-view";
 
 import { LrcLine, AUTO_SCROLL_AFTER_USER_SCROLL } from "../constant";
 import useLrc from "../util/use_lrc";
@@ -44,24 +45,21 @@ interface Props {
   [key: string]: any;
 }
 
+interface LrcProps {
+  scrollToCurrentLine: () => void;
+  getCurrentLine: () => {
+    index: number;
+    lrcLine: LrcLine | null;
+  };
+}
 // eslint-disable-next-line no-spaced-func
-const Lrc = React.forwardRef<
-  {
-    scrollToCurrentLine: () => void;
-    getCurrentLine: () => {
-      index: number;
-      lrcLine: LrcLine | null;
-    };
-  },
-  Props
->(function Lrc(
+const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   {
     lrc,
     lineRenderer = ({ lrcLine: { content }, active }) => (
       <Text
         style={{
           textAlign: "center",
-          color: active ? "white" : "gray",
           fontSize: active ? 16 : 13,
           opacity: active ? 1 : 0.4,
           fontWeight: active ? "500" : "400",
@@ -129,17 +127,29 @@ const Lrc = React.forwardRef<
       });
     },
   }));
+
   const lyricNodeList = useMemo(
     () =>
       lrcLineList.map((lrcLine, index) => (
-        <View
+        <MaskedView
           key={lrcLine.id}
           style={{
             height: currentIndex === index ? activeLineHeight : lineHeight,
           }}
+          maskElement={lineRenderer({
+            lrcLine,
+            index,
+            active: currentIndex === index,
+          })}
         >
-          {lineRenderer({ lrcLine, index, active: currentIndex === index })}
-        </View>
+          <View
+            style={{
+              flex: 1,
+              height: "100%",
+              backgroundColor: "gray",
+            }}
+          />
+        </MaskedView>
       )),
     [activeLineHeight, currentIndex, lineHeight, lineRenderer, lrcLineList]
   );
