@@ -22,7 +22,7 @@ interface Props {
     index: number;
     active: boolean;
     color?: string;
-  }) => React.ReactNode;
+  }) => JSX.Element;
   /** audio currentTime, millisecond */
   currentTime?: number;
   /** whether auto scroll  */
