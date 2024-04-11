@@ -1848,10 +1848,10 @@
     prompts "^2.4.2"
     semver "^7.5.2"
 
-"@react-native-masked-view/masked-view@0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@react-native-masked-view/masked-view/-/masked-view-0.3.0.tgz#bd29fae18d148a685331910a3c7b766ce87eafcc"
-  integrity sha512-qLyoObcjzrkpNcoJjXquUePXfL1dXjHtuv+yX0zZ0Q4kG5yvVqd620+tSh7WbRoHkjpXhFBfLwvGhcWB2I0Lpw==
+"@react-native-masked-view/masked-view@^0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@react-native-masked-view/masked-view/-/masked-view-0.3.1.tgz#5bd76f17004a6ccbcec03856893777ee91f23d29"
+  integrity sha512-uVm8U6nwFIlUd1iDIB5cS+lDadApKR+l8k4k84d9hn+GN4lzAIJhUZ9syYX7c022MxNgAlbxoFLt0pqKoyaAGg==
 
 "@react-native/assets-registry@0.73.1", "@react-native/assets-registry@~0.73.1":
   version "0.73.1"
@@ -5557,6 +5557,10 @@ react-is@^17.0.1:
   version "17.0.2"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.2.tgz#e691d4a8e9c789365655539ab372762b0efb54f0"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
+
+"react-native-lyric@link:..":
+  version "0.0.0"
+  uid ""
 
 react-native@0.73.6:
   version "0.73.6"

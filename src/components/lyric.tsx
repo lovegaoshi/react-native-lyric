@@ -22,7 +22,7 @@ interface Props {
     index: number;
     active: boolean;
     color?: string;
-  }) => React.ReactNode;
+  }) => JSX.Element;
   /** audio currentTime, millisecond */
   currentTime?: number;
   /** whether auto scroll  */
@@ -62,11 +62,13 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     lineRenderer = ({ lrcLine: { content }, active, color }) => (
       <Text
         style={{
+          flex: 1,
           textAlign: "center",
           color,
           fontSize: active ? 16 : 13,
           opacity: active ? 1 : 0.4,
           fontWeight: active ? "500" : "400",
+          // width: "100%",
         }}
       >
         {content}
@@ -83,7 +85,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     noScrollThrottle,
     showUnformatted = true,
     onPress,
-    useMaskedView = true,
+    useMaskedView = false,
     ...props
   }: Props,
   ref
@@ -138,6 +140,8 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
       <MaskedView
         key={lrcLine.id}
         style={{
+          flex: 1,
+          flexDirection: "row",
           height: currentIndex === index ? activeLineHeight : lineHeight,
         }}
         androidRenderingMode={"software"}
@@ -147,12 +151,41 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
           active: currentIndex === index,
         })}
       >
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: currentIndex === index ? "white" : "gray",
-          }}
-        />
+        {currentIndex !== index ? (
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "gray",
+            }}
+          />
+        ) : lrcLine.duration ? (
+          <>
+            <View
+              style={{
+                width: `${
+                  ((currentTime - lrcLine.millisecond) / lrcLine.duration) * 100
+                }%`,
+                backgroundColor: "white",
+              }}
+            />
+            <View
+              style={{
+                width: `${
+                  (1 - (currentTime - lrcLine.millisecond) / lrcLine.duration) *
+                  100
+                }%`,
+                backgroundColor: "gray",
+              }}
+            />
+          </>
+        ) : (
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "white",
+            }}
+          />
+        )}
       </MaskedView>
     );
   };
@@ -200,7 +233,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
         onPress?.()
       }
     >
-      <View>
+      <View style={{ flex: 1 }}>
         {autoScroll ? (
           <View style={{ width: "100%", height: 0.45 * height }} />
         ) : null}

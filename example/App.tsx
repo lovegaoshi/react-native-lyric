@@ -3,10 +3,10 @@ import { Text, View, StyleSheet } from "react-native";
 import Constants from "expo-constants";
 
 // or any pure javascript modules available in npm
-import { Lrc } from "./src/index";
+import { Lrc } from "react-native-lyric";
 import useTimer from "./time";
 const lrc = `
-[00:00.00]Dreamers 
+[00:00.00]Dreamers Dreamers Dreamers Dreamers Dreamers Dreamers Dreamers Dreamers Dreamers Dreamers Dreamers Dreamers Dreamers 
 [00:04.43]Jungkook BTS
 [00:09.11]
 [00:09.61] ....
@@ -57,6 +57,7 @@ export default function App() {
         currentTime={currentMillisecond}
         autoScroll
         autoScrollAfterUserScroll={500}
+        useMaskedView={true}
       />
     </View>
   );
