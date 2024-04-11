@@ -237,7 +237,13 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
         {autoScroll ? (
           <View style={{ width: "100%", height: 0.45 * height }} />
         ) : null}
-        {lyricNodeList}
+        {useMaskedView
+          ? lrcLineList.map((lrcLine, index) =>
+              useMaskedView
+                ? maskedLrcLine(lrcLine, index)
+                : standardLrcLine(lrcLine, index)
+            )
+          : lyricNodeList}
         {autoScroll ? (
           <View style={{ width: "100%", height: 0.5 * height }} />
         ) : null}
