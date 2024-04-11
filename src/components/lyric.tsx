@@ -136,6 +136,14 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   }));
 
   const maskedLrcLine = (lrcLine: LrcLine, index: number) => {
+    const maskProgress = useRef(0);
+    useEffect(() => {
+      if (currentIndex === index && lrcLine.duration) {
+        maskProgress.current = (currentTime - lrcLine.millisecond) / lrcLine.duration
+      } else {
+        maskProgress.current = 0;
+      }
+    }, [currentIndex, currentTime])
     return (
       <MaskedView
         key={lrcLine.id}
@@ -163,7 +171,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
             <View
               style={{
                 width: `${
-                  ((currentTime - lrcLine.millisecond) / lrcLine.duration) * 100
+                  maskProgress.current * 100
                 }%`,
                 backgroundColor: "white",
               }}
@@ -171,8 +179,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
             <View
               style={{
                 width: `${
-                  (1 - (currentTime - lrcLine.millisecond) / lrcLine.duration) *
-                  100
+                  (1 - maskProgress.current) * 100
                 }%`,
                 backgroundColor: "gray",
               }}
@@ -208,10 +215,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
 
   const lyricNodeList = useMemo(
     () =>
-      lrcLineList.map((lrcLine, index) =>
-        useMaskedView
-          ? maskedLrcLine(lrcLine, index)
-          : standardLrcLine(lrcLine, index)
+      lrcLineList.map((lrcLine, index) => standardLrcLine(lrcLine, index)
       ),
     [activeLineHeight, currentIndex, lineHeight, lineRenderer, lrcLineList]
   );
