@@ -1,6 +1,6 @@
 import type { LrcLine } from "../../constant";
 import getRandomString from "../get_random_string";
-import parse from "./parse";
+import parse from "./parseHelper";
 
 const LRC_LINE = /^(\[[0-9]+:[0-9]+(\.[0-9]+)?\])+.*/;
 const LRC_TIMESTAMP_WITH_BRACKET = /\[[0-9]+:[0-9]+(\.[0-9]+)?\]/g;

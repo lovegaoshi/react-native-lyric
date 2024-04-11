@@ -1,7 +1,16 @@
 import type { LrcLine } from "../../constant";
 import getRandomString from "../get_random_string";
 
-export default (lrcLineList: LrcLine[], unformattedLrc: string[], showUnformatted = true): LrcLine[] => {
+export enum Source {
+  Lrc = "Lrc",
+  Krc = "Krc",
+}
+
+export default (
+  lrcLineList: LrcLine[],
+  unformattedLrc: string[],
+  showUnformatted = true
+): LrcLine[] => {
   const sortedLrcs = lrcLineList.sort((a, b) => a.millisecond - b.millisecond);
   return showUnformatted && sortedLrcs.length === 0
     ? unformattedLrc.map((content) => ({
@@ -10,7 +19,7 @@ export default (lrcLineList: LrcLine[], unformattedLrc: string[], showUnformatte
         content,
       }))
     : sortedLrcs.map((lrcLine, i) => ({
-      ...lrcLine,
-      duration: lrcLineList[i + 1]?.millisecond - lrcLine.millisecond,
-    }));
+        ...lrcLine,
+        duration: lrcLineList[i + 1]?.millisecond - lrcLine.millisecond,
+      }));
 };
