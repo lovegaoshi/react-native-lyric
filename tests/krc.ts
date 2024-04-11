@@ -1,6 +1,4 @@
-import parseKrc from "../src/util/parser/parseKrc";
-
-export const KGKRC = `
+export default `
     [id:$00000000]
     [ar:李荣浩]
     [ti:麻雀]
@@ -77,8 +75,3 @@ export const KGKRC = `
     [203562,5380]<0,252,0>你<252,604,0>成<856,557,0>仙<1413,203,0>我<1616,353,0>替<1969,657,0>你<2626,678,0>留<3304,708,0>守<4012,455,0>人<4467,913,0>间
     [209125,252786]<0,255,0>麻<255,1011,0>雀<1266,301,0>也<1567,1115,0>有<2682,456,0>明<3138,2379,0>天
     `;
-
-test("parse krc", () => {
-  const content = parseKrc(KGKRC);
-  expect(content).not.toBe(undefined);
-});
