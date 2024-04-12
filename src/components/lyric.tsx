@@ -3,7 +3,7 @@ import React, { useRef, useImperativeHandle, useEffect, useMemo } from "react";
 import { ScrollView, StyleProp, Text, View, ViewStyle } from "react-native";
 import MaskedView from "@react-native-masked-view/masked-view";
 
-import { LrcLine, AUTO_SCROLL_AFTER_USER_SCROLL, KaraokeMode } from "../constant";
+import { LrcLine, AUTO_SCROLL_AFTER_USER_SCROLL, KaraokeMode, calcKaraokePercentage } from "../constant";
 import useLrc from "../util/use_lrc";
 import useCurrentIndex from "./use_current_index";
 import useLocalAutoScroll from "./use_local_auto_scroll";
@@ -171,10 +171,11 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
           index: karaokeIndex,
           active: true,
           onLayout: (e) => karaokeWidths.current[karaokeIndex] = e.nativeEvent.layout.width,
-          keyPrefix: 'karaokeFakeLine'
+          keyPrefix: 'karaokeFakeLine',
+          color:karaokeOffColor
         }))
        : lrcLine.karaokeLines?.map((karaokeLine, karaokeIndex) => (
-<MaskedView
+        <MaskedView
         key={`${lrcLine.id}.${karaokeIndex}`}
         style={{
           flexDirection: "row",
@@ -188,29 +189,18 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
           active: true,
         })}
       >
-        {lrcLine.duration ? (
-          <>
             <View
               style={{
-                width: `${0 * 100}%`,
+                width: `${calcKaraokePercentage(currentTime, karaokeLine)}%`,
                 backgroundColor: karaokeOnColor,
               }}
             />
             <View
               style={{
-                width: `${(1 ) * 100}%`,
+                width: `${100 - calcKaraokePercentage(currentTime, karaokeLine)}%`,
                 backgroundColor: karaokeOffColor,
               }}
             />
-          </>
-        ) : (
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: karaokeOnColor,
-            }}
-          />
-        )}
       </MaskedView>
       ))
     }
