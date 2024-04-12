@@ -1,5 +1,5 @@
 export type {LrcLine} from './constant';
-
+export {KaraokeMode} from './constant';
 export {default as Lrc} from './components/lyric';
 export {default as parseLrc} from './util/parser/parseLrc';
 export {default as parseKrc} from './util/parser/parseKrc';

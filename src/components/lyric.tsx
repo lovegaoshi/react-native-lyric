@@ -3,7 +3,7 @@ import React, { useRef, useImperativeHandle, useEffect, useMemo } from "react";
 import { ScrollView, StyleProp, Text, View, ViewStyle } from "react-native";
 import MaskedView from "@react-native-masked-view/masked-view";
 
-import { LrcLine, AUTO_SCROLL_AFTER_USER_SCROLL } from "../constant";
+import { LrcLine, AUTO_SCROLL_AFTER_USER_SCROLL, KaraokeMode } from "../constant";
 import useLrc from "../util/use_lrc";
 import useCurrentIndex from "./use_current_index";
 import useLocalAutoScroll from "./use_local_auto_scroll";
@@ -12,17 +12,7 @@ interface Props {
   /** lrc string */
   lrc: string;
   /** lrc line render */
-  lineRenderer: ({
-    lrcLine,
-    index,
-    active,
-    color,
-  }: {
-    lrcLine: LrcLine;
-    index: number;
-    active: boolean;
-    color?: string;
-  }) => JSX.Element;
+  lineRenderer: (props: LineRendererProps) => JSX.Element;
   /** audio currentTime, millisecond */
   currentTime?: number;
   /** whether auto scroll  */
@@ -44,9 +34,9 @@ interface Props {
   noScrollThrottle?: boolean;
   showUnformatted?: boolean;
   onPress?: () => void;
-  useMaskedView?: boolean;
   karaokeOnColor?: string;
   karaokeOffColor?: string;
+  karaokeMode?: KaraokeMode;
   [key: string]: any;
 }
 
@@ -57,14 +47,21 @@ interface LrcProps {
     lrcLine: LrcLine | null;
   };
 }
-// eslint-disable-next-line no-spaced-func
-const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
-  {
-    lrc,
-    lineRenderer = ({ lrcLine: { content }, active, color }) => (
+
+
+interface LineRendererProps {
+  lrcLine: {content: string};
+  active: boolean;
+  color?: string;
+  index?: number;
+  onLayout?: (e: any) => void;
+  keyPrefix?: string
+}
+const defaultLineRenderer = ({ lrcLine: { content }, active, color,onLayout, index, keyPrefix="lyric" }: LineRendererProps) => (
       <Text
+        key={`${keyPrefix}.${index}`}
+        onLayout={onLayout}
         style={{
-          flex: 1,
           textAlign: "center",
           color,
           fontSize: active ? 16 : 13,
@@ -75,7 +72,13 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
       >
         {content}
       </Text>
-    ),
+    )
+
+// eslint-disable-next-line no-spaced-func
+const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
+  {
+    lrc,
+    lineRenderer = defaultLineRenderer,
     currentTime = 0,
     autoScroll = true,
     lineHeight = 26,
@@ -87,9 +90,9 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     noScrollThrottle,
     showUnformatted = true,
     onPress,
-    useMaskedView = false,
     karaokeOffColor = "gray",
     karaokeOnColor = "white",
+    karaokeMode = KaraokeMode.NoKaraoke,
     ...props
   }: Props,
   ref
@@ -105,6 +108,11 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
       autoScroll,
       autoScrollAfterUserScroll,
     });
+  const karaokeWidths = useRef<Array<number | undefined>>([undefined]);
+
+  useEffect(() => {
+    karaokeWidths.current = [undefined];
+  }, [currentIndex])
 
   // auto scroll
   useEffect(() => {
@@ -138,15 +146,79 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     },
   }));
 
-  const calculateMaskedLrcLineProgress = (lrcLine: LrcLine, index: number) => {
+  const calculateKaraokeLrcLineProgress = (lrcLine: LrcLine, index: number) => {
     if (currentIndex === index && lrcLine.duration) {
       return (currentTime - lrcLine.millisecond) / lrcLine.duration;
     } else {
       return 0;
     }
   };
-  const maskedLrcLine = (lrcLine: LrcLine, index: number) => {
-    const karaokeProgress = calculateMaskedLrcLineProgress(lrcLine, index);
+
+  const realKaraokeLrcLine = (lrcLine: LrcLine, index: number) => {
+    return (
+    <View
+      key={lrcLine.id}
+      style={{
+        height: activeLineHeight,
+          flexDirection: "row",
+          width: "100%",
+          justifyContent: "center",
+      }}
+    >{
+      karaokeWidths.current.includes(undefined) ? 
+      lrcLine.karaokeLines?.map((karaokeLine, karaokeIndex) => lineRenderer({
+          lrcLine: {content: karaokeLine.content},
+          index: karaokeIndex,
+          active: true,
+          onLayout: (e) => karaokeWidths.current[karaokeIndex] = e.nativeEvent.layout.width,
+          keyPrefix: 'karaokeFakeLine'
+        }))
+       : lrcLine.karaokeLines?.map((karaokeLine, karaokeIndex) => (
+<MaskedView
+        key={`${lrcLine.id}.${karaokeIndex}`}
+        style={{
+          flexDirection: "row",
+          height: activeLineHeight,
+          width: karaokeWidths.current[karaokeIndex],
+        }}
+        androidRenderingMode={"software"}
+        maskElement={lineRenderer({
+          lrcLine: {content: karaokeLine.content},
+          index,
+          active: true,
+        })}
+      >
+        {lrcLine.duration ? (
+          <>
+            <View
+              style={{
+                width: `${0 * 100}%`,
+                backgroundColor: karaokeOnColor,
+              }}
+            />
+            <View
+              style={{
+                width: `${(1 ) * 100}%`,
+                backgroundColor: karaokeOffColor,
+              }}
+            />
+          </>
+        ) : (
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: karaokeOnColor,
+            }}
+          />
+        )}
+      </MaskedView>
+      ))
+    }
+    </View>
+  )};
+
+  const karaokeLrcLine = (lrcLine: LrcLine, index: number) => {
+    const karaokeProgress = calculateKaraokeLrcLineProgress(lrcLine, index);
 
     return (
       <MaskedView
@@ -154,23 +226,16 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
         style={{
           flex: 1,
           flexDirection: "row",
-          height: currentIndex === index ? activeLineHeight : lineHeight,
+          height: activeLineHeight,
         }}
         androidRenderingMode={"software"}
         maskElement={lineRenderer({
           lrcLine,
           index,
-          active: currentIndex === index,
+          active: true,
         })}
       >
-        {currentIndex !== index ? (
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: karaokeOffColor,
-            }}
-          />
-        ) : lrcLine.duration ? (
+        {lrcLine.duration ? (
           <>
             <View
               style={{
@@ -217,6 +282,24 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     () => lrcLineList.map((lrcLine, index) => standardLrcLine(lrcLine, index)),
     [activeLineHeight, currentIndex, lineHeight, lineRenderer, lrcLineList]
   );
+
+  const determineKaraokeMode = (lrcLine: LrcLine, index: number) => {
+    if (currentIndex !== index) {
+      return standardLrcLine(lrcLine, index);
+    }
+    switch (karaokeMode) {
+      case KaraokeMode.OnlyRealKaraoke:
+        return lrcLine.karaokeLines ? realKaraokeLrcLine(lrcLine, index) : standardLrcLine(lrcLine, index)
+      case KaraokeMode.FakeKaraoke:
+        return karaokeLrcLine(lrcLine, index)
+      case KaraokeMode.Karaoke:
+        return lrcLine.karaokeLines ? realKaraokeLrcLine(lrcLine, index) : karaokeLrcLine(lrcLine, index)
+      case KaraokeMode.NoKaraoke:
+      default:
+        return standardLrcLine(lrcLine, index);
+    }
+  }
+
   return (
     <ScrollView
       {...props}
@@ -239,13 +322,9 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
         {autoScroll ? (
           <View style={{ width: "100%", height: 0.45 * height }} />
         ) : null}
-        {useMaskedView
-          ? lrcLineList.map((lrcLine, index) =>
-              useMaskedView
-                ? maskedLrcLine(lrcLine, index)
-                : standardLrcLine(lrcLine, index)
-            )
-          : lyricNodeList}
+        {karaokeMode === KaraokeMode.NoKaraoke
+          ? lyricNodeList
+          : lrcLineList.map(determineKaraokeMode)}
         {autoScroll ? (
           <View style={{ width: "100%", height: 0.5 * height }} />
         ) : null}

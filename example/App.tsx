@@ -4,7 +4,7 @@ import Constants from "expo-constants";
 import lrc from "../tests/krc";
 
 // or any pure javascript modules available in npm
-import { Lrc } from "react-native-lyric";
+import { Lrc, KaraokeMode } from "react-native-lyric";
 import useTimer from "./time";
 
 export default function App() {
@@ -21,7 +21,7 @@ export default function App() {
         currentTime={currentMillisecond}
         autoScroll
         autoScrollAfterUserScroll={500}
-        useMaskedView={true}
+        karaokeMode={KaraokeMode.OnlyRealKaraoke}
       />
     </View>
   );

@@ -13,3 +13,10 @@ export interface LrcLine {
   duration?: number;
   karaokeLines?: KaraokeLine[];
 }
+
+export enum KaraokeMode {
+  NoKaraoke = "no_karaoke",
+  FakeKaraoke = "fake_karaoke",
+  OnlyRealKaraoke = "real_karaoke",
+  Karaoke = "karaoke",
+}
