@@ -263,7 +263,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
         lrcLine,
         index,
         active: currentIndex === index,
-        color: currentIndex === index ? "white" : "gray",
+        color: currentIndex === index ? karaokeOnColor : karaokeOffColor,
       })}
     </View>
   );
