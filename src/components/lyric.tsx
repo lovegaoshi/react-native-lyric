@@ -64,8 +64,8 @@ const defaultLineRenderer = ({ lrcLine: { content }, active, color,onLayout, ind
         style={{
           textAlign: "center",
           color,
-          fontSize: active ? 16 : 13,
-          opacity: active ? 1 : 0.4,
+          fontSize: active ? 16 : 14,
+          opacity: active ? 1 : 0.8,
           fontWeight: active ? "500" : "400",
           // width: "100%",
         }}
@@ -187,6 +187,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
           lrcLine: {content: karaokeLine.content},
           index,
           active: true,
+          color: 'white'
         })}
       >
             <View
