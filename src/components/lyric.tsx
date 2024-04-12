@@ -45,6 +45,8 @@ interface Props {
   showUnformatted?: boolean;
   onPress?: () => void;
   useMaskedView?: boolean;
+  karaokeOnColor?: string;
+  karaokeOffColor?: string;
   [key: string]: any;
 }
 
@@ -86,6 +88,8 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     showUnformatted = true,
     onPress,
     useMaskedView = false,
+    karaokeOffColor = "gray",
+    karaokeOnColor = "white",
     ...props
   }: Props,
   ref
@@ -114,11 +118,10 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
 
   // on current line change
   useEffect(() => {
-    onCurrentLineChange &&
-      onCurrentLineChange({
-        index: currentIndex,
-        lrcLine: lrcLineList[currentIndex] || null,
-      });
+    onCurrentLineChange?.({
+      index: currentIndex,
+      lrcLine: lrcLineList[currentIndex] || null,
+    });
   }, [lrcLineList, currentIndex, onCurrentLineChange]);
 
   useImperativeHandle(ref, () => ({
@@ -135,15 +138,16 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     },
   }));
 
+  const calculateMaskedLrcLineProgress = (lrcLine: LrcLine, index: number) => {
+    if (currentIndex === index && lrcLine.duration) {
+      return (currentTime - lrcLine.millisecond) / lrcLine.duration;
+    } else {
+      return 0;
+    }
+  };
   const maskedLrcLine = (lrcLine: LrcLine, index: number) => {
-    const maskProgress = useRef(0);
-    useEffect(() => {
-      if (currentIndex === index && lrcLine.duration) {
-        maskProgress.current = (currentTime - lrcLine.millisecond) / lrcLine.duration
-      } else {
-        maskProgress.current = 0;
-      }
-    }, [currentIndex, currentTime])
+    const karaokeProgress = calculateMaskedLrcLineProgress(lrcLine, index);
+
     return (
       <MaskedView
         key={lrcLine.id}
@@ -163,25 +167,21 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
           <View
             style={{
               flex: 1,
-              backgroundColor: "gray",
+              backgroundColor: karaokeOffColor,
             }}
           />
         ) : lrcLine.duration ? (
           <>
             <View
               style={{
-                width: `${
-                  maskProgress.current * 100
-                }%`,
-                backgroundColor: "white",
+                width: `${karaokeProgress * 100}%`,
+                backgroundColor: karaokeOnColor,
               }}
             />
             <View
               style={{
-                width: `${
-                  (1 - maskProgress.current) * 100
-                }%`,
-                backgroundColor: "gray",
+                width: `${(1 - karaokeProgress) * 100}%`,
+                backgroundColor: karaokeOffColor,
               }}
             />
           </>
@@ -189,7 +189,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
           <View
             style={{
               flex: 1,
-              backgroundColor: "white",
+              backgroundColor: karaokeOnColor,
             }}
           />
         )}
@@ -214,9 +214,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   );
 
   const lyricNodeList = useMemo(
-    () =>
-      lrcLineList.map((lrcLine, index) => standardLrcLine(lrcLine, index)
-      ),
+    () => lrcLineList.map((lrcLine, index) => standardLrcLine(lrcLine, index)),
     [activeLineHeight, currentIndex, lineHeight, lineRenderer, lrcLineList]
   );
   return (
