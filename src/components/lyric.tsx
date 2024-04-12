@@ -69,6 +69,7 @@ const defaultLineRenderer = ({ lrcLine: { content }, active, color,onLayout, ind
           fontWeight: active ? "500" : "400",
           // width: "100%",
         }}
+        numberOfLines={1}
       >
         {content}
       </Text>
