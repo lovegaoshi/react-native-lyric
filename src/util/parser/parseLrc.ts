@@ -1,5 +1,6 @@
-import type { LrcLine } from "../constant";
-import getRandomString from "./get_random_string";
+import type { LrcLine } from "../../constant";
+import getRandomString from "../get_random_string";
+import parse from "./parseHelper";
 
 const LRC_LINE = /^(\[[0-9]+:[0-9]+(\.[0-9]+)?\])+.*/;
 const LRC_TIMESTAMP_WITH_BRACKET = /\[[0-9]+:[0-9]+(\.[0-9]+)?\]/g;
@@ -30,15 +31,5 @@ export default (lrc: string, showUnformatted = true): LrcLine[] => {
       });
     }
   }
-  const sortedLrcs = lrcLineList.sort((a, b) => a.millisecond - b.millisecond);
-  return showUnformatted && sortedLrcs.length === 0
-    ? unformattedLrc.map((content) => ({
-        id: getRandomString(),
-        millisecond: 0,
-        content,
-      }))
-    : sortedLrcs.map((lrcLine, i) => ({
-      ...lrcLine,
-      duration: lrcLineList[i + 1]?.millisecond - lrcLine.millisecond,
-    }));
+  return parse(lrcLineList, unformattedLrc, showUnformatted);
 };

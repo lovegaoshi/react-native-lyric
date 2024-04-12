@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 
-import parseLrc from "./parse_lrc";
+import parser from "./parser/parser";
 
 export default (lrc: string, showUnformatted = true) => {
-  const lrcLineList = useMemo(() => parseLrc(lrc, showUnformatted), [lrc]);
+  const lrcLineList = useMemo(() => parser(lrc, showUnformatted), [lrc]);
   return lrcLineList;
 };
