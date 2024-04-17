@@ -1,4 +1,4 @@
-import "./wdyr"; // <--- first import
+// import "./wdyr"; // <--- first import
 
 import * as React from "react";
 import { Text, View, StyleSheet } from "react-native";
