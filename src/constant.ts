@@ -12,7 +12,6 @@ export interface LrcLine {
   content: string;
   duration?: number;
   karaokeLines?: KaraokeLine[];
-  white?: 0|1;
 }
 
 export enum KaraokeMode {
