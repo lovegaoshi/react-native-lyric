@@ -3,10 +3,20 @@ import React, { useRef, useImperativeHandle, useEffect, useMemo } from "react";
 import { ScrollView, StyleProp, Text, View, ViewStyle } from "react-native";
 import MaskedView from "@react-native-masked-view/masked-view";
 
-import { LrcLine, AUTO_SCROLL_AFTER_USER_SCROLL, KaraokeMode, calcKaraokePercentage } from "../constant";
+import {
+  LrcLine,
+  AUTO_SCROLL_AFTER_USER_SCROLL,
+  KaraokeMode,
+  calcKaraokePercentage,
+} from "../constant";
 import useLrc from "../util/use_lrc";
 import useCurrentIndex from "./use_current_index";
 import useLocalAutoScroll from "./use_local_auto_scroll";
+import {
+  defaultLineRenderer,
+  LineRendererProps,
+  MemoStandardLine,
+} from "./LrcLine";
 
 interface Props {
   /** lrc string */
@@ -48,32 +58,6 @@ interface LrcProps {
   };
 }
 
-
-interface LineRendererProps {
-  lrcLine: {content: string};
-  active: boolean;
-  color?: string;
-  index?: number;
-  onLayout?: (e: any) => void;
-  keyPrefix?: string
-}
-const defaultLineRenderer = ({ lrcLine: { content }, active, color,onLayout, index, keyPrefix="lyric" }: LineRendererProps) => (
-      <Text
-        key={`${keyPrefix}.${index}`}
-        onLayout={onLayout}
-        style={{
-          textAlign: "center",
-          color,
-          fontSize: active ? 16 : 14,
-          opacity: active ? 1 : 0.8,
-          fontWeight: active ? "500" : "400",
-          // width: "100%",
-        }}
-      >
-        {content}
-      </Text>
-    )
-
 // eslint-disable-next-line no-spaced-func
 const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   {
@@ -112,7 +96,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
 
   useEffect(() => {
     karaokeWidths.current = [undefined];
-  }, [currentIndex])
+  }, [currentIndex]);
 
   // auto scroll
   useEffect(() => {
@@ -156,57 +140,66 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
 
   const realKaraokeLrcLine = (lrcLine: LrcLine, index: number) => {
     return (
-    <View
-      key={lrcLine.id}
-      style={{
-        height: activeLineHeight,
+      <View
+        key={lrcLine.id}
+        style={{
+          height: activeLineHeight,
           flexDirection: "row",
           width: "100%",
           justifyContent: "center",
-      }}
-    >{
-      karaokeWidths.current.includes(undefined) ? 
-      lrcLine.karaokeLines?.map((karaokeLine, karaokeIndex) => lineRenderer({
-          lrcLine: {content: karaokeLine.content},
-          index: karaokeIndex,
-          active: true,
-          onLayout: (e) => karaokeWidths.current[karaokeIndex] = e.nativeEvent.layout.width,
-          keyPrefix: 'karaokeFakeLine',
-          color:karaokeOffColor
-        }))
-       : lrcLine.karaokeLines?.map((karaokeLine, karaokeIndex) => (
-        <MaskedView
-        key={`${lrcLine.id}.${karaokeIndex}`}
-        style={{
-          flexDirection: "row",
-          height: activeLineHeight,
-          width: karaokeWidths.current[karaokeIndex],
         }}
-        androidRenderingMode={"software"}
-        maskElement={lineRenderer({
-          lrcLine: {content: karaokeLine.content},
-          index,
-          active: true,
-          color: 'white'
-        })}
       >
-            <View
-              style={{
-                width: `${calcKaraokePercentage(currentTime, karaokeLine)}%`,
-                backgroundColor: karaokeOnColor,
-              }}
-            />
-            <View
-              style={{
-                width: `${100 - calcKaraokePercentage(currentTime, karaokeLine)}%`,
-                backgroundColor: karaokeOffColor,
-              }}
-            />
-      </MaskedView>
-      ))
-    }
-    </View>
-  )};
+        {karaokeWidths.current.includes(undefined)
+          ? lrcLine.karaokeLines?.map((karaokeLine, karaokeIndex) =>
+              lineRenderer({
+                lrcLine: { content: karaokeLine.content },
+                index: karaokeIndex,
+                active: true,
+                onLayout: (e) =>
+                  (karaokeWidths.current[karaokeIndex] =
+                    e.nativeEvent.layout.width),
+                keyPrefix: "karaokeFakeLine",
+                color: karaokeOffColor,
+              })
+            )
+          : lrcLine.karaokeLines?.map((karaokeLine, karaokeIndex) => (
+              <MaskedView
+                key={`${lrcLine.id}.${karaokeIndex}`}
+                style={{
+                  flexDirection: "row",
+                  height: activeLineHeight,
+                  width: karaokeWidths.current[karaokeIndex],
+                }}
+                androidRenderingMode={"software"}
+                maskElement={lineRenderer({
+                  lrcLine: { content: karaokeLine.content },
+                  index,
+                  active: true,
+                  color: "white",
+                })}
+              >
+                <View
+                  style={{
+                    width: `${calcKaraokePercentage(
+                      currentTime,
+                      karaokeLine
+                    )}%`,
+                    backgroundColor: karaokeOnColor,
+                  }}
+                />
+                <View
+                  style={{
+                    width: `${
+                      100 - calcKaraokePercentage(currentTime, karaokeLine)
+                    }%`,
+                    backgroundColor: karaokeOffColor,
+                  }}
+                />
+              </MaskedView>
+            ))}
+      </View>
+    );
+  };
 
   const karaokeLrcLine = (lrcLine: LrcLine, index: number) => {
     const karaokeProgress = calculateKaraokeLrcLineProgress(lrcLine, index);
@@ -253,43 +246,57 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     );
   };
 
-  const standardLrcLine = (lrcLine: LrcLine, index: number) => (
-    <View
-      key={lrcLine.id}
-      style={{
-        height: currentIndex === index ? activeLineHeight : lineHeight,
-      }}
-    >
-      {lineRenderer({
-        lrcLine,
-        index,
-        active: currentIndex === index,
-        color: currentIndex === index ? karaokeOnColor : karaokeOffColor,
-      })}
-    </View>
-  );
-
   const lyricNodeList = useMemo(
-    () => lrcLineList.map((lrcLine, index) => standardLrcLine(lrcLine, index)),
+    () =>
+      lrcLineList.map((lrcLine, index) => (
+        <MemoStandardLine
+          key={`${lrcLine.id}.standard.${index}`}
+          lrcLine={lrcLine}
+          index={index}
+          currentIndex={currentIndex}
+          activeLineHeight={activeLineHeight}
+          lineHeight={lineHeight}
+          karaokeOnColor={karaokeOnColor}
+          karaokeOffColor={karaokeOffColor}
+          lineRenderer={lineRenderer}
+        />
+      )),
     [activeLineHeight, currentIndex, lineHeight, lineRenderer, lrcLineList]
   );
 
   const determineKaraokeMode = (lrcLine: LrcLine, index: number) => {
+    const defaultLine = () => (
+      <MemoStandardLine
+        key={`${lrcLine.id}.standard.${index}`}
+        lrcLine={lrcLine}
+        index={index}
+        currentIndex={currentIndex}
+        activeLineHeight={activeLineHeight}
+        lineHeight={lineHeight}
+        karaokeOnColor={karaokeOnColor}
+        karaokeOffColor={karaokeOffColor}
+        lineRenderer={lineRenderer}
+      />
+    );
     if (currentIndex !== index) {
-      return standardLrcLine(lrcLine, index);
+      return defaultLine();
     }
     switch (karaokeMode) {
       case KaraokeMode.OnlyRealKaraoke:
-        return lrcLine.karaokeLines ? realKaraokeLrcLine(lrcLine, index) : standardLrcLine(lrcLine, index)
+        return lrcLine.karaokeLines
+          ? realKaraokeLrcLine(lrcLine, index)
+          : defaultLine();
       case KaraokeMode.FakeKaraoke:
-        return karaokeLrcLine(lrcLine, index)
+        return karaokeLrcLine(lrcLine, index);
       case KaraokeMode.Karaoke:
-        return lrcLine.karaokeLines ? realKaraokeLrcLine(lrcLine, index) : karaokeLrcLine(lrcLine, index)
+        return lrcLine.karaokeLines
+          ? realKaraokeLrcLine(lrcLine, index)
+          : karaokeLrcLine(lrcLine, index);
       case KaraokeMode.NoKaraoke:
       default:
-        return standardLrcLine(lrcLine, index);
+        return defaultLine();
     }
-  }
+  };
 
   return (
     <ScrollView

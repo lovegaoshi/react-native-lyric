@@ -1,7 +1,9 @@
+import "./wdyr"; // <--- first import
+
 import * as React from "react";
 import { Text, View, StyleSheet } from "react-native";
 import Constants from "expo-constants";
-import lrc from "../tests/krc";
+import lrc from "../tests/qrc";
 
 // or any pure javascript modules available in npm
 import { Lrc, KaraokeMode } from "react-native-lyric";
@@ -12,10 +14,7 @@ export default function App() {
     useTimer(1);
   return (
     <View style={styles.container}>
-      <Text style={styles.paragraph}>
-        Change code in the editor and watch it change on your phone! Save to get
-        a shareable url.
-      </Text>
+      <Text style={styles.paragraph}>current time: {currentMillisecond}</Text>
       <Lrc
         lrc={lrc}
         currentTime={currentMillisecond}
