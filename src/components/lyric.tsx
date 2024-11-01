@@ -58,7 +58,7 @@ interface LrcProps {
   };
 }
 
-// eslint-disable-next-line no-spaced-func
+// @ts-expect-error eslint-disable-next-line no-spaced-func
 const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   {
     lrc,
