@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useRef, useImperativeHandle, useEffect, useMemo } from "react";
+import React, { useRef, useImperativeHandle, useEffect, useMemo, useState } from "react";
 import { ScrollView, StyleProp, Text, View, ViewStyle } from "react-native";
 import MaskedView from "@react-native-masked-view/masked-view";
 
@@ -57,6 +57,79 @@ interface LrcProps {
     lrcLine: LrcLine | null;
   };
 }
+
+interface KareokeProps {
+  lrcLine: LrcLine;
+  index: number;
+  activeLineHeight: number;
+  lineRenderer: (props: LineRendererProps) => JSX.Element;
+  karaokeOnColor: string;
+  karaokeOffColor: string;
+  currentTime: number;
+}
+
+const RealKaraokeLrcLine = ({lrcLine, index, activeLineHeight, lineRenderer, karaokeOnColor, karaokeOffColor, currentTime}: KareokeProps) => {
+
+  const [karaokeWidths, setKaraokeWidths] = useState<Array<number | undefined>>([]);
+
+  return (
+    <View
+      key={lrcLine.id}
+      style={{
+        height: activeLineHeight,
+        flexDirection: "row",
+        width: "100%",
+        justifyContent: "center",
+      }}
+    >
+      {lrcLine.karaokeLines?.map((karaokeLine, karaokeIndex) => (
+            <MaskedView
+              key={`${lrcLine.id}.${karaokeIndex}`}
+              style={{
+                flexDirection: "row",
+                height: activeLineHeight,
+                width: karaokeWidths[karaokeIndex] ?? 0,
+              }}
+              maskElement={lineRenderer({
+                lrcLine: { content: karaokeLine.content },
+                index,
+                active: true,
+                color: "white",
+              })}
+            >
+              <View
+                style={{
+                  width: `${calcKaraokePercentage(
+                    currentTime,
+                    karaokeLine
+                  )}%`,
+                  backgroundColor: karaokeOnColor,
+                }}
+              />
+              <View
+                style={{
+                  width: `${
+                    100 - calcKaraokePercentage(currentTime, karaokeLine)
+                  }%`,
+                  backgroundColor: karaokeOffColor,
+                }}
+              />
+            </MaskedView>
+          ))}
+    {lrcLine.karaokeLines?.map((karaokeLine, karaokeIndex) =>
+        lineRenderer({
+          lrcLine: { content: karaokeLine.content },
+          index: karaokeIndex,
+          active: true,
+          onLayout: (e) =>setKaraokeWidths(v => {v[karaokeIndex] = e?.nativeEvent?.layout?.width; return v}),
+          keyPrefix: "karaokeFakeLine",
+          color: karaokeOffColor,
+          hidden: true,
+        })
+      )}
+    </View>
+  );
+};
 
 // @ts-expect-error eslint-disable-next-line no-spaced-func
 const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
@@ -138,68 +211,6 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     }
   };
 
-  const realKaraokeLrcLine = (lrcLine: LrcLine, index: number) => {
-    return (
-      <View
-        key={lrcLine.id}
-        style={{
-          height: activeLineHeight,
-          flexDirection: "row",
-          width: "100%",
-          justifyContent: "center",
-        }}
-      >
-        {lrcLine.karaokeLines?.map((karaokeLine, karaokeIndex) => (
-              <MaskedView
-                key={`${lrcLine.id}.${karaokeIndex}`}
-                style={{
-                  flexDirection: "row",
-                  height: activeLineHeight,
-                  width: karaokeWidths.current[karaokeIndex] ?? 0,
-                }}
-                androidRenderingMode={"software"}
-                maskElement={lineRenderer({
-                  lrcLine: { content: karaokeLine.content },
-                  index,
-                  active: true,
-                  color: "white",
-                })}
-              >
-                <View
-                  style={{
-                    width: `${calcKaraokePercentage(
-                      currentTime,
-                      karaokeLine
-                    )}%`,
-                    backgroundColor: karaokeOnColor,
-                  }}
-                />
-                <View
-                  style={{
-                    width: `${
-                      100 - calcKaraokePercentage(currentTime, karaokeLine)
-                    }%`,
-                    backgroundColor: karaokeOffColor,
-                  }}
-                />
-              </MaskedView>
-            ))}
-      {lrcLine.karaokeLines?.map((karaokeLine, karaokeIndex) =>
-          lineRenderer({
-            lrcLine: { content: karaokeLine.content },
-            index: karaokeIndex,
-            active: true,
-            onLayout: (e) =>(karaokeWidths.current[karaokeIndex] =
-                e.nativeEvent.layout.width),
-            keyPrefix: "karaokeFakeLine",
-            color: karaokeOffColor,
-            hidden: true,
-          })
-        )}
-      </View>
-    );
-  };
-
   const karaokeLrcLine = (lrcLine: LrcLine, index: number) => {
     const karaokeProgress = calculateKaraokeLrcLineProgress(lrcLine, index);
 
@@ -211,7 +222,6 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
           flexDirection: "row",
           height: activeLineHeight,
         }}
-        androidRenderingMode={"software"}
         maskElement={lineRenderer({
           lrcLine,
           index,
@@ -283,13 +293,13 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     switch (karaokeMode) {
       case KaraokeMode.OnlyRealKaraoke:
         return lrcLine.karaokeLines
-          ? realKaraokeLrcLine(lrcLine, index)
+          ? (<RealKaraokeLrcLine currentTime={currentTime} lrcLine={lrcLine} index={index} lineRenderer={lineRenderer} activeLineHeight={activeLineHeight} karaokeOffColor={karaokeOffColor} karaokeOnColor={karaokeOnColor}/>)
           : defaultLine();
       case KaraokeMode.FakeKaraoke:
         return karaokeLrcLine(lrcLine, index);
       case KaraokeMode.Karaoke:
         return lrcLine.karaokeLines
-          ? realKaraokeLrcLine(lrcLine, index)
+          ? (<RealKaraokeLrcLine currentTime={currentTime} lrcLine={lrcLine} index={index} lineRenderer={lineRenderer} activeLineHeight={activeLineHeight} karaokeOffColor={karaokeOffColor} karaokeOnColor={karaokeOnColor}/>)
           : karaokeLrcLine(lrcLine, index);
       case KaraokeMode.NoKaraoke:
       default:
