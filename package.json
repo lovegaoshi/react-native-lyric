@@ -49,6 +49,6 @@
     "react-native": "*",
     "@react-native-masked-view/masked-view": "^0.3.1"
   },
-  "dependencies": {
-  }
+  "dependencies": {},
+  "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
 }
