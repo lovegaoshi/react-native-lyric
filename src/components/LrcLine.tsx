@@ -10,6 +10,7 @@ export interface LineRendererProps {
   index?: number;
   onLayout?: (e: any) => void;
   keyPrefix?: string;
+  hidden?: boolean,
 }
 
 export const defaultLineRenderer = ({
@@ -19,6 +20,7 @@ export const defaultLineRenderer = ({
   onLayout,
   index,
   keyPrefix = "lyric",
+  hidden = false,
 }: LineRendererProps) => (
   <Text
     key={`${keyPrefix}.${index}`}
@@ -27,8 +29,9 @@ export const defaultLineRenderer = ({
       textAlign: "center",
       color,
       fontSize: active ? 16 : 14,
-      opacity: active ? 1 : 0.8,
+      opacity: hidden ? 0 : active ? 1 : 0.8,
       fontWeight: active ? "500" : "400",
+      position: hidden ? 'absolute' : undefined,
       // width: "100%",
     }}
     numberOfLines={1}

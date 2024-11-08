@@ -149,26 +149,13 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
           justifyContent: "center",
         }}
       >
-        {karaokeWidths.current.includes(undefined)
-          ? lrcLine.karaokeLines?.map((karaokeLine, karaokeIndex) =>
-              lineRenderer({
-                lrcLine: { content: karaokeLine.content },
-                index: karaokeIndex,
-                active: true,
-                onLayout: (e) =>
-                  (karaokeWidths.current[karaokeIndex] =
-                    e.nativeEvent.layout.width),
-                keyPrefix: "karaokeFakeLine",
-                color: karaokeOffColor,
-              })
-            )
-          : lrcLine.karaokeLines?.map((karaokeLine, karaokeIndex) => (
+        {lrcLine.karaokeLines?.map((karaokeLine, karaokeIndex) => (
               <MaskedView
                 key={`${lrcLine.id}.${karaokeIndex}`}
                 style={{
                   flexDirection: "row",
                   height: activeLineHeight,
-                  width: karaokeWidths.current[karaokeIndex],
+                  width: karaokeWidths.current[karaokeIndex] ?? 0,
                 }}
                 androidRenderingMode={"software"}
                 maskElement={lineRenderer({
@@ -197,6 +184,18 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
                 />
               </MaskedView>
             ))}
+      {lrcLine.karaokeLines?.map((karaokeLine, karaokeIndex) =>
+          lineRenderer({
+            lrcLine: { content: karaokeLine.content },
+            index: karaokeIndex,
+            active: true,
+            onLayout: (e) =>(karaokeWidths.current[karaokeIndex] =
+                e.nativeEvent.layout.width),
+            keyPrefix: "karaokeFakeLine",
+            color: karaokeOffColor,
+            hidden: true,
+          })
+        )}
       </View>
     );
   };
