@@ -124,7 +124,7 @@ const RealKaraokeLrcLine = ({lrcLine, index, activeLineHeight, lineRenderer, kar
           onLayout: (e) =>setKaraokeWidths(v => {v[karaokeIndex] = e?.nativeEvent?.layout?.width; return v}),
           keyPrefix: "karaokeFakeLine",
           color: karaokeOffColor,
-          hidden: true,
+          hidden: karaokeWidths[0] !== undefined,
         })
       )}
     </View>
