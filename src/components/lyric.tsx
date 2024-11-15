@@ -76,10 +76,11 @@ const RealKaraokeLrcLine = ({lrcLine, index, activeLineHeight, lineRenderer, kar
     <View
       key={lrcLine.id}
       style={{
-        height: activeLineHeight,
         flexDirection: "row",
         width: "100%",
         justifyContent: "center",
+        flexWrap: 'wrap',
+        alignItems: 'flex-start'
       }}
     >
       {lrcLine.karaokeLines?.map((karaokeLine, karaokeIndex) => (

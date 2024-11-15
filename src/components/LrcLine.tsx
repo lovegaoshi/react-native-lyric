@@ -26,6 +26,7 @@ export const defaultLineRenderer = ({
     key={`${keyPrefix}.${index}`}
     onLayout={onLayout}
     style={{
+      paddingVertical: 4,
       textAlign: "center",
       color,
       fontSize: active ? 16 : 14,
@@ -34,7 +35,6 @@ export const defaultLineRenderer = ({
       position: hidden ? 'absolute' : undefined,
       // width: "100%",
     }}
-    numberOfLines={1}
   >
     {content}
   </Text>
@@ -54,8 +54,6 @@ const StandardLrcLine = function standardLrcLine({
   lrcLine,
   index,
   currentIndex,
-  activeLineHeight,
-  lineHeight,
   karaokeOnColor,
   karaokeOffColor,
   lineRenderer = defaultLineRenderer,
@@ -63,9 +61,6 @@ const StandardLrcLine = function standardLrcLine({
   return (
     <View
       key={lrcLine.id}
-      style={{
-        height: currentIndex === index ? activeLineHeight : lineHeight,
-      }}
     >
       {lineRenderer({
         lrcLine,
