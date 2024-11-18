@@ -197,7 +197,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     if (noScrollThrottle || localAutoScroll) {
       lrcRef.current?.scrollTo({
         y: lrcHeights.current[currentIndex]
-          ? lrcHeights.current[currentIndex] - height / 2
+          ? lrcHeights.current[currentIndex] - height / 2 - lineHeight
           : currentIndex * lineHeight || 0,
         animated: true,
       });
@@ -221,7 +221,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
       resetLocalAutoScroll();
       lrcRef.current?.scrollTo({
         y: lrcHeights.current[currentIndex]
-          ? lrcHeights.current[currentIndex] - height / 2
+          ? lrcHeights.current[currentIndex] - height / 2 - lineHeight
           : currentIndex * lineHeight || 0,
         animated: true,
       });
@@ -326,6 +326,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
       case KaraokeMode.OnlyRealKaraoke:
         return lrcLine.karaokeLines ? (
           <RealKaraokeLrcLine
+            key={`${lrcLine.id}.real.${index}`}
             currentTime={currentTime}
             lrcLine={lrcLine}
             index={index}
@@ -345,6 +346,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
       case KaraokeMode.Karaoke:
         return lrcLine.karaokeLines ? (
           <RealKaraokeLrcLine
+            key={`${lrcLine.id}.real.${index}`}
             currentTime={currentTime}
             lrcLine={lrcLine}
             index={index}
