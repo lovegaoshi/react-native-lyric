@@ -10,7 +10,7 @@ export interface LineRendererProps {
   index?: number;
   onLayout?: (e: any) => void;
   keyPrefix?: string;
-  hidden?: boolean,
+  hidden?: boolean;
 }
 
 export const defaultLineRenderer = ({
@@ -32,7 +32,7 @@ export const defaultLineRenderer = ({
       fontSize: active ? 16 : 14,
       opacity: hidden ? 0 : active ? 1 : 0.8,
       fontWeight: active ? "500" : "400",
-      position: hidden ? 'absolute' : undefined,
+      position: hidden ? "absolute" : undefined,
       // width: "100%",
     }}
   >
@@ -49,6 +49,7 @@ interface StandardLrcLineProps {
   lineHeight: number;
   karaokeOnColor: string;
   karaokeOffColor: string;
+  onViewLayout?: (e: any) => void;
 }
 const StandardLrcLine = function standardLrcLine({
   lrcLine,
@@ -56,12 +57,11 @@ const StandardLrcLine = function standardLrcLine({
   currentIndex,
   karaokeOnColor,
   karaokeOffColor,
+  onViewLayout,
   lineRenderer = defaultLineRenderer,
 }: StandardLrcLineProps) {
   return (
-    <View
-      key={lrcLine.id}
-    >
+    <View key={lrcLine.id} onLayout={onViewLayout}>
       {lineRenderer({
         lrcLine,
         index,

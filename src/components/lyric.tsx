@@ -1,5 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useRef, useImperativeHandle, useEffect, useMemo, useState } from "react";
+import React, {
+  useRef,
+  useImperativeHandle,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { ScrollView, StyleProp, Text, View, ViewStyle } from "react-native";
 import MaskedView from "@react-native-masked-view/masked-view";
 
@@ -66,63 +72,76 @@ interface KareokeProps {
   karaokeOnColor: string;
   karaokeOffColor: string;
   currentTime: number;
+  onViewLayout?: (e: any) => void;
 }
 
-const RealKaraokeLrcLine = ({lrcLine, index, activeLineHeight, lineRenderer, karaokeOnColor, karaokeOffColor, currentTime}: KareokeProps) => {
-
-  const [karaokeWidths, setKaraokeWidths] = useState<Array<number | undefined>>([]);
+const RealKaraokeLrcLine = ({
+  lrcLine,
+  index,
+  activeLineHeight,
+  lineRenderer,
+  karaokeOnColor,
+  karaokeOffColor,
+  currentTime,
+  onViewLayout,
+}: KareokeProps) => {
+  const [karaokeWidths, setKaraokeWidths] = useState<Array<number | undefined>>(
+    []
+  );
 
   return (
     <View
+      onLayout={onViewLayout}
       key={lrcLine.id}
       style={{
         flexDirection: "row",
         width: "100%",
         justifyContent: "center",
-        flexWrap: 'wrap',
-        alignItems: 'flex-start'
+        flexWrap: "wrap",
+        alignItems: "flex-start",
       }}
     >
       {lrcLine.karaokeLines?.map((karaokeLine, karaokeIndex) => (
-            <MaskedView
-              key={`${lrcLine.id}.${karaokeIndex}`}
-              style={{
-                flexDirection: "row",
-                height: activeLineHeight,
-                width: karaokeWidths[karaokeIndex] ?? 0,
-              }}
-              maskElement={lineRenderer({
-                lrcLine: { content: karaokeLine.content },
-                index,
-                active: true,
-                color: "white",
-              })}
-            >
-              <View
-                style={{
-                  width: `${calcKaraokePercentage(
-                    currentTime,
-                    karaokeLine
-                  )}%`,
-                  backgroundColor: karaokeOnColor,
-                }}
-              />
-              <View
-                style={{
-                  width: `${
-                    100 - calcKaraokePercentage(currentTime, karaokeLine)
-                  }%`,
-                  backgroundColor: karaokeOffColor,
-                }}
-              />
-            </MaskedView>
-          ))}
-    {lrcLine.karaokeLines?.map((karaokeLine, karaokeIndex) =>
+        <MaskedView
+          key={`${lrcLine.id}.${karaokeIndex}`}
+          style={{
+            flexDirection: "row",
+            height: activeLineHeight,
+            width: karaokeWidths[karaokeIndex] ?? 0,
+          }}
+          maskElement={lineRenderer({
+            lrcLine: { content: karaokeLine.content },
+            index,
+            active: true,
+            color: "white",
+          })}
+        >
+          <View
+            style={{
+              width: `${calcKaraokePercentage(currentTime, karaokeLine)}%`,
+              backgroundColor: karaokeOnColor,
+            }}
+          />
+          <View
+            style={{
+              width: `${
+                100 - calcKaraokePercentage(currentTime, karaokeLine)
+              }%`,
+              backgroundColor: karaokeOffColor,
+            }}
+          />
+        </MaskedView>
+      ))}
+      {lrcLine.karaokeLines?.map((karaokeLine, karaokeIndex) =>
         lineRenderer({
           lrcLine: { content: karaokeLine.content },
           index: karaokeIndex,
           active: true,
-          onLayout: (e) =>setKaraokeWidths(v => {v[karaokeIndex] = e?.nativeEvent?.layout?.width; return v}),
+          onLayout: (e) =>
+            setKaraokeWidths((v) => {
+              v[karaokeIndex] = e?.nativeEvent?.layout?.width;
+              return v;
+            }),
           keyPrefix: "karaokeFakeLine",
           color: karaokeOffColor,
           hidden: karaokeWidths[0] !== undefined,
@@ -159,6 +178,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   const locationX = useRef(0);
   const lrcLineList = useLrc(lrc, showUnformatted);
   const scrolled = useRef(false);
+  const lrcHeights = useRef<number[]>([]);
 
   const currentIndex = useCurrentIndex({ lrcLineList, currentTime });
   const { localAutoScroll, resetLocalAutoScroll, onScroll } =
@@ -176,7 +196,9 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   useEffect(() => {
     if (noScrollThrottle || localAutoScroll) {
       lrcRef.current?.scrollTo({
-        y: currentIndex * lineHeight || 0,
+        y: lrcHeights.current[currentIndex]
+          ? lrcHeights.current[currentIndex] - height / 2
+          : currentIndex * lineHeight || 0,
         animated: true,
       });
     }
@@ -198,7 +220,9 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     scrollToCurrentLine: () => {
       resetLocalAutoScroll();
       lrcRef.current?.scrollTo({
-        y: currentIndex * lineHeight || 0,
+        y: lrcHeights.current[currentIndex]
+          ? lrcHeights.current[currentIndex] - height / 2
+          : currentIndex * lineHeight || 0,
         animated: true,
       });
     },
@@ -217,6 +241,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
 
     return (
       <MaskedView
+        onLayout={(e) => (lrcHeights.current[index] = e.nativeEvent.layout.y)}
         key={lrcLine.id}
         style={{
           flex: 1,
@@ -269,6 +294,9 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
           karaokeOnColor={karaokeOnColor}
           karaokeOffColor={karaokeOffColor}
           lineRenderer={lineRenderer}
+          onViewLayout={(e) =>
+            (lrcHeights.current[index] = e.nativeEvent.layout.y)
+          }
         />
       )),
     [activeLineHeight, currentIndex, lineHeight, lineRenderer, lrcLineList]
@@ -286,6 +314,9 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
         karaokeOnColor={karaokeOnColor}
         karaokeOffColor={karaokeOffColor}
         lineRenderer={lineRenderer}
+        onViewLayout={(e) =>
+          (lrcHeights.current[index] = e.nativeEvent.layout.y)
+        }
       />
     );
     if (currentIndex !== index) {
@@ -293,15 +324,41 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     }
     switch (karaokeMode) {
       case KaraokeMode.OnlyRealKaraoke:
-        return lrcLine.karaokeLines
-          ? (<RealKaraokeLrcLine currentTime={currentTime} lrcLine={lrcLine} index={index} lineRenderer={lineRenderer} activeLineHeight={activeLineHeight} karaokeOffColor={karaokeOffColor} karaokeOnColor={karaokeOnColor}/>)
-          : defaultLine();
+        return lrcLine.karaokeLines ? (
+          <RealKaraokeLrcLine
+            currentTime={currentTime}
+            lrcLine={lrcLine}
+            index={index}
+            lineRenderer={lineRenderer}
+            activeLineHeight={activeLineHeight}
+            karaokeOffColor={karaokeOffColor}
+            karaokeOnColor={karaokeOnColor}
+            onViewLayout={(e) =>
+              (lrcHeights.current[index] = e.nativeEvent.layout.y)
+            }
+          />
+        ) : (
+          defaultLine()
+        );
       case KaraokeMode.FakeKaraoke:
         return karaokeLrcLine(lrcLine, index);
       case KaraokeMode.Karaoke:
-        return lrcLine.karaokeLines
-          ? (<RealKaraokeLrcLine currentTime={currentTime} lrcLine={lrcLine} index={index} lineRenderer={lineRenderer} activeLineHeight={activeLineHeight} karaokeOffColor={karaokeOffColor} karaokeOnColor={karaokeOnColor}/>)
-          : karaokeLrcLine(lrcLine, index);
+        return lrcLine.karaokeLines ? (
+          <RealKaraokeLrcLine
+            currentTime={currentTime}
+            lrcLine={lrcLine}
+            index={index}
+            lineRenderer={lineRenderer}
+            activeLineHeight={activeLineHeight}
+            karaokeOffColor={karaokeOffColor}
+            karaokeOnColor={karaokeOnColor}
+            onViewLayout={(e) =>
+              (lrcHeights.current[index] = e.nativeEvent.layout.y)
+            }
+          />
+        ) : (
+          karaokeLrcLine(lrcLine, index)
+        );
       case KaraokeMode.NoKaraoke:
       default:
         return defaultLine();
