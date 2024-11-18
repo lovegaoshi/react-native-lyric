@@ -10,7 +10,7 @@ export interface LineRendererProps {
   index?: number;
   onLayout?: (e: any) => void;
   keyPrefix?: string;
-  hidden?: boolean,
+  hidden?: boolean;
 }
 
 export const defaultLineRenderer = ({
@@ -26,15 +26,15 @@ export const defaultLineRenderer = ({
     key={`${keyPrefix}.${index}`}
     onLayout={onLayout}
     style={{
+      paddingVertical: 4,
       textAlign: "center",
       color,
       fontSize: active ? 16 : 14,
       opacity: hidden ? 0 : active ? 1 : 0.8,
       fontWeight: active ? "500" : "400",
-      position: hidden ? 'absolute' : undefined,
+      position: hidden ? "absolute" : undefined,
       // width: "100%",
     }}
-    numberOfLines={1}
   >
     {content}
   </Text>
@@ -49,24 +49,19 @@ interface StandardLrcLineProps {
   lineHeight: number;
   karaokeOnColor: string;
   karaokeOffColor: string;
+  onViewLayout?: (e: any) => void;
 }
 const StandardLrcLine = function standardLrcLine({
   lrcLine,
   index,
   currentIndex,
-  activeLineHeight,
-  lineHeight,
   karaokeOnColor,
   karaokeOffColor,
+  onViewLayout,
   lineRenderer = defaultLineRenderer,
 }: StandardLrcLineProps) {
   return (
-    <View
-      key={lrcLine.id}
-      style={{
-        height: currentIndex === index ? activeLineHeight : lineHeight,
-      }}
-    >
+    <View key={lrcLine.id} onLayout={onViewLayout}>
       {lineRenderer({
         lrcLine,
         index,
