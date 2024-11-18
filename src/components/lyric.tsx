@@ -197,7 +197,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     if (noScrollThrottle || localAutoScroll) {
       lrcRef.current?.scrollTo({
         y: lrcHeights.current[currentIndex]
-          ? lrcHeights.current[currentIndex] - height / 2 - lineHeight
+          ? lrcHeights.current[currentIndex] - height / 2
           : currentIndex * lineHeight || 0,
         animated: true,
       });
@@ -221,7 +221,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
       resetLocalAutoScroll();
       lrcRef.current?.scrollTo({
         y: lrcHeights.current[currentIndex]
-          ? lrcHeights.current[currentIndex] - height / 2 - lineHeight
+          ? lrcHeights.current[currentIndex] - height / 2
           : currentIndex * lineHeight || 0,
         animated: true,
       });
