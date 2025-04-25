@@ -1,7 +1,7 @@
-import {useState, useCallback} from 'react';
+import { useState, useCallback } from "react";
 
-import useThrottle from '../util/use_throttle';
-import useDebounce from '../util/use_debounce';
+import useThrottle from "../util/useThrottle";
+import useDebounce from "../util/useDebounce";
 
 export default ({
   autoScroll,
@@ -13,12 +13,12 @@ export default ({
   const [localAutoScroll, setLocalAutoScroll] = useState(autoScroll);
   const resetLocalAutoScroll = useCallback(
     () => setLocalAutoScroll(autoScroll),
-    [autoScroll],
+    [autoScroll]
   );
 
   const resetAutoScrollAfterUserScroll = useDebounce(
     () => setLocalAutoScroll(autoScroll),
-    autoScrollAfterUserScroll,
+    autoScrollAfterUserScroll
   );
 
   const onScroll = useThrottle(() => {
@@ -26,5 +26,5 @@ export default ({
     resetAutoScrollAfterUserScroll();
   });
 
-  return {localAutoScroll, resetLocalAutoScroll, onScroll};
+  return { localAutoScroll, resetLocalAutoScroll, onScroll };
 };

@@ -7,9 +7,9 @@ import {
   AUTO_SCROLL_AFTER_USER_SCROLL,
   KaraokeMode,
 } from "../constant";
-import useLrc from "../util/use_lrc";
-import useCurrentIndex from "./use_current_index";
-import useLocalAutoScroll from "./use_local_auto_scroll";
+import useLrc from "../util/useLrc";
+import useCurrentIndex from "./useCurrentIndex";
+import useLocalAutoScroll from "./useLocalAutoScroll";
 import {
   defaultLineRenderer,
   LineRendererProps,

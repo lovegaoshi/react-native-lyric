@@ -1,5 +1,5 @@
 import type { LrcLine } from "../../constant";
-import getRandomString from "../get_random_string";
+import getRandomString from "../getRandomString";
 
 export enum Source {
   Lrc = "Lrc",

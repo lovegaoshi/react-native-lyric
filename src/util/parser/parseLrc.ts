@@ -1,5 +1,5 @@
 import type { LrcLine } from "../../constant";
-import getRandomString from "../get_random_string";
+import getRandomString from "../getRandomString";
 import parse from "./parseHelper";
 
 const LRC_LINE = /^(\[[0-9]+:[0-9]+(\.[0-9]+)?\])+.*/;

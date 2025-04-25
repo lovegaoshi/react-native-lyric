@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, View } from "react-native";
 
-import { LrcLine } from "../constant";
+import type { LrcLine } from "../constant";
 
 export interface LineRendererProps {
   lrcLine: { content: string };
