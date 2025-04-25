@@ -1,7 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useRef, useImperativeHandle, useEffect, useMemo } from "react";
 import { ScrollView, StyleProp, View, ViewStyle } from "react-native";
-import MaskedView from "@react-native-masked-view/masked-view";
 
 import {
   LrcLine,
@@ -17,6 +16,7 @@ import {
   MemoStandardLine,
 } from "./LrcLine";
 import { RealKaraokeLrcLine } from "./KLrcLine";
+import { FakeKaraokeLrcLine } from "./FakeKLrcLine";
 
 interface Props {
   /** lrc string */
@@ -134,59 +134,6 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     },
   }));
 
-  const calculateKaraokeLrcLineProgress = (lrcLine: LrcLine, index: number) => {
-    if (currentIndex === index && lrcLine.duration) {
-      return (currentTime - lrcLine.millisecond) / lrcLine.duration;
-    } else {
-      return 0;
-    }
-  };
-
-  const karaokeLrcLine = (lrcLine: LrcLine, index: number) => {
-    const karaokeProgress = calculateKaraokeLrcLineProgress(lrcLine, index);
-
-    return (
-      <MaskedView
-        onLayout={(e) => (lrcHeights.current[index] = e.nativeEvent.layout.y)}
-        key={lrcLine.id}
-        style={{
-          flex: 1,
-          flexDirection: "row",
-          height: activeLineHeight,
-        }}
-        maskElement={lineRenderer({
-          lrcLine,
-          index,
-          active: true,
-        })}
-      >
-        {lrcLine.duration ? (
-          <>
-            <View
-              style={{
-                width: `${karaokeProgress * 100}%`,
-                backgroundColor: karaokeOnColor,
-              }}
-            />
-            <View
-              style={{
-                width: `${(1 - karaokeProgress) * 100}%`,
-                backgroundColor: karaokeOffColor,
-              }}
-            />
-          </>
-        ) : (
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: karaokeOnColor,
-            }}
-          />
-        )}
-      </MaskedView>
-    );
-  };
-
   const lyricNodeList = useMemo(
     () =>
       lrcLineList.map((lrcLine, index) => (
@@ -225,6 +172,21 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
         }
       />
     );
+
+    const FakeKaraokeLine = () => (
+      <FakeKaraokeLrcLine
+        currentIndex={currentIndex}
+        currentTime={currentTime}
+        index={index}
+        lrcLine={lrcLine}
+        lrcHeights={lrcHeights}
+        activeLineHeight={activeLineHeight}
+        lineRenderer={lineRenderer}
+        karaokeOffColor={karaokeOffColor}
+        karaokeOnColor={karaokeOnColor}
+      />
+    );
+
     if (currentIndex !== index) {
       return defaultLine();
     }
@@ -248,7 +210,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
           defaultLine()
         );
       case KaraokeMode.FakeKaraoke:
-        return karaokeLrcLine(lrcLine, index);
+        return <FakeKaraokeLine />;
       case KaraokeMode.Karaoke:
         return lrcLine.karaokeLines ? (
           <RealKaraokeLrcLine
@@ -265,7 +227,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
             }
           />
         ) : (
-          karaokeLrcLine(lrcLine, index)
+          <FakeKaraokeLine />
         );
       case KaraokeMode.NoKaraoke:
       default:
