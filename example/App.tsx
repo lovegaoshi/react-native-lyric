@@ -21,7 +21,6 @@ export default function App() {
         autoScroll
         autoScrollAfterUserScroll={500}
         karaokeMode={KaraokeMode.OnlyRealKaraoke}
-        noScrollThrottle
       />
     </View>
   );

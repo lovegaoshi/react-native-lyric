@@ -9,7 +9,6 @@ import {
 } from "../constant";
 import useLrc from "../util/useLrc";
 import useCurrentIndex from "./useCurrentIndex";
-import useLocalAutoScroll from "./useLocalAutoScroll";
 import {
   defaultLineRenderer,
   LineRendererProps,
@@ -41,8 +40,6 @@ interface Props {
   height: number;
   lineHeight: number;
   activeLineHeight: number;
-  // automatically scroll to the current line or not.
-  noScrollThrottle?: boolean;
   showUnformatted?: boolean;
   onPress?: () => void;
   karaokeOnColor?: string;
@@ -71,7 +68,6 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     onCurrentLineChange,
     height = 500,
     style,
-    noScrollThrottle,
     showUnformatted = true,
     onPress,
     karaokeOffColor = "gray",
@@ -84,12 +80,9 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   const lrcRef = useRef<ScrollView>(null);
   const lrcLineList = useLrc(lrc, showUnformatted);
   const lrcHeights = useRef<number[]>([]);
+  const scrolled = useRef(false);
 
   const currentIndex = useCurrentIndex({ lrcLineList, currentTime });
-  const { resetLocalAutoScroll, onScroll } = useLocalAutoScroll({
-    autoScroll,
-    autoScrollAfterUserScroll,
-  });
   const karaokeWidths = useRef<Array<number | undefined>>([undefined]);
 
   useEffect(() => {
@@ -98,7 +91,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
 
   // auto scroll
   useEffect(() => {
-    if (noScrollThrottle) {
+    if (autoScroll && scrolled.current === false) {
       lrcRef.current?.scrollTo({
         y: lrcHeights.current[currentIndex]
           ? lrcHeights.current[currentIndex] - height / 2
@@ -121,15 +114,6 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
       index: currentIndex,
       lrcLine: lrcLineList[currentIndex] || null,
     }),
-    scrollToCurrentLine: () => {
-      resetLocalAutoScroll();
-      lrcRef.current?.scrollTo({
-        y: lrcHeights.current[currentIndex]
-          ? lrcHeights.current[currentIndex] - height / 2
-          : currentIndex * lineHeight || 0,
-        animated: true,
-      });
-    },
   }));
 
   const lyricNodeList = useMemo(
@@ -239,8 +223,10 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
       showsVerticalScrollIndicator={false}
       ref={lrcRef}
       scrollEventThrottle={30}
-      onScroll={onScroll}
       style={[style, { height }]}
+      onScrollBeginDrag={() => (scrolled.current = true)}
+      onScrollEndDrag={() => (scrolled.current = false)}
+      onMomentumScrollEnd={() => (scrolled.current = false)}
     >
       <View style={{ flex: 1 }}>
         {autoScroll ? (
