@@ -62,6 +62,7 @@ interface LrcProps {
   };
 }
 
+// @ts-expect-error
 const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   {
     lrc,
