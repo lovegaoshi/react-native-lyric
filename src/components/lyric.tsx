@@ -41,6 +41,7 @@ interface Props {
   height: number;
   lineHeight: number;
   activeLineHeight: number;
+  // automatically scroll to the current line or not.
   noScrollThrottle?: boolean;
   showUnformatted?: boolean;
   onPress?: () => void;
@@ -81,17 +82,14 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   ref
 ) {
   const lrcRef = useRef<ScrollView>(null);
-  const locationX = useRef(0);
   const lrcLineList = useLrc(lrc, showUnformatted);
-  const scrolled = useRef(false);
   const lrcHeights = useRef<number[]>([]);
 
   const currentIndex = useCurrentIndex({ lrcLineList, currentTime });
-  const { localAutoScroll, resetLocalAutoScroll, onScroll } =
-    useLocalAutoScroll({
-      autoScroll,
-      autoScrollAfterUserScroll,
-    });
+  const { resetLocalAutoScroll, onScroll } = useLocalAutoScroll({
+    autoScroll,
+    autoScrollAfterUserScroll,
+  });
   const karaokeWidths = useRef<Array<number | undefined>>([undefined]);
 
   useEffect(() => {
@@ -100,7 +98,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
 
   // auto scroll
   useEffect(() => {
-    if (noScrollThrottle || localAutoScroll) {
+    if (noScrollThrottle) {
       lrcRef.current?.scrollTo({
         y: lrcHeights.current[currentIndex]
           ? lrcHeights.current[currentIndex] - height / 2
@@ -108,7 +106,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
         animated: true,
       });
     }
-  }, [currentIndex, localAutoScroll, lineHeight]);
+  }, [currentIndex, lineHeight]);
 
   // on current line change
   useEffect(() => {
@@ -243,15 +241,6 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
       scrollEventThrottle={30}
       onScroll={onScroll}
       style={[style, { height }]}
-      onScrollBeginDrag={() => (scrolled.current = true)}
-      onScrollEndDrag={() => (scrolled.current = false)}
-      onMomentumScrollEnd={() => (scrolled.current = false)}
-      onTouchStart={(e) => (locationX.current = e.nativeEvent.locationX)}
-      onTouchEnd={(e) =>
-        Math.abs(locationX.current - e.nativeEvent.locationX) < 5 &&
-        !scrolled.current &&
-        onPress?.()
-      }
     >
       <View style={{ flex: 1 }}>
         {autoScroll ? (
