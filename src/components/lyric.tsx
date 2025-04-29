@@ -56,7 +56,6 @@ interface Props {
 }
 
 interface LrcProps {
-  scrollToCurrentLine: () => void;
   getCurrentLine: () => {
     index: number;
     lrcLine: LrcLine | null;
