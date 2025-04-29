@@ -22,6 +22,7 @@ export default function App() {
         autoScrollAfterUserScroll={500}
         karaokeMode={KaraokeMode.OnlyRealKaraoke}
         onPress={console.log}
+        onLinePress={console.log}
       />
     </View>
   );

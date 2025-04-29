@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, Pressable } from "react-native";
+import { Text, Pressable, View } from "react-native";
 
 import type { LrcLine } from "../constant";
 
@@ -63,18 +63,26 @@ const StandardLrcLine = function standardLrcLine({
   onPress,
 }: StandardLrcLineProps) {
   return (
-    <Pressable
-      key={lrcLine.id}
-      onLayout={onViewLayout}
-      onPress={() => onPress?.(lrcLine)}
+    <View
+      style={{
+        flexDirection: "row",
+        justifyContent: "center",
+      }}
     >
-      {lineRenderer({
-        lrcLine,
-        index,
-        active: currentIndex === index,
-        color: currentIndex === index ? karaokeOnColor : karaokeOffColor,
-      })}
-    </Pressable>
+      <Pressable
+        key={lrcLine.id}
+        onLayout={onViewLayout}
+        onPress={() => onPress?.(lrcLine)}
+        onStartShouldSetResponder={() => true}
+      >
+        {lineRenderer({
+          lrcLine,
+          index,
+          active: currentIndex === index,
+          color: currentIndex === index ? karaokeOnColor : karaokeOffColor,
+        })}
+      </Pressable>
+    </View>
   );
 };
 

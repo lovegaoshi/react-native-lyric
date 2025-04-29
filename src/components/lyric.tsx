@@ -1,6 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useRef, useImperativeHandle, useEffect, useMemo } from "react";
-import { ScrollView, StyleProp, View, ViewStyle } from "react-native";
+import {
+  ScrollView,
+  StyleProp,
+  View,
+  ViewStyle,
+  Pressable,
+} from "react-native";
 
 import {
   LrcLine,
@@ -42,6 +48,7 @@ interface Props {
   activeLineHeight: number;
   showUnformatted?: boolean;
   onPress?: () => void;
+  onLinePress?: (l: LrcLine) => void;
   karaokeOnColor?: string;
   karaokeOffColor?: string;
   karaokeMode?: KaraokeMode;
@@ -70,6 +77,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     style,
     showUnformatted = true,
     onPress,
+    onLinePress,
     karaokeOffColor = "gray",
     karaokeOnColor = "white",
     karaokeMode = KaraokeMode.NoKaraoke,
@@ -152,7 +160,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
         onViewLayout={(e) =>
           (lrcHeights.current[index] = e.nativeEvent.layout.y)
         }
-        onPress={onPress}
+        onPress={onLinePress}
       />
     );
 
@@ -246,7 +254,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
       scrollEventThrottle={30}
       style={[style, { height }]}
     >
-      <View style={{ flex: 1 }}>
+      <Pressable style={{ flex: 1 }} onPress={onPress}>
         {autoScroll ? (
           <View style={{ width: "100%", height: 0.45 * height }} />
         ) : null}
@@ -256,7 +264,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
         {autoScroll ? (
           <View style={{ width: "100%", height: 0.5 * height }} />
         ) : null}
-      </View>
+      </Pressable>
     </ScrollView>
   );
 });
