@@ -152,6 +152,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
         onViewLayout={(e) =>
           (lrcHeights.current[index] = e.nativeEvent.layout.y)
         }
+        onPress={onPress}
       />
     );
 
@@ -217,6 +218,26 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     }
   };
 
+  /**
+   * need to investigate wtf is going on.
+   * on a scrollTo event, momentumBegin is called; then onScroll; then nothing else.
+   * on a scroll vent, scrollBegin is called, then momentumEnd. 
+   * if either momentum events are registered, pressable wont work until momentumEnd 
+   * emits (via manual scrolling)
+   * TODO: retest this in RN 0.79
+   * 
+      onScrollBeginDrag={(e) => console.log("scroll begin ", e.nativeEvent)}
+      onScrollEndDrag={(e) => console.log("scroll end ", e.nativeEvent)}
+      onMomentumScrollBegin={(e) =>
+        console.log("momentum begin ", e.nativeEvent)
+      }
+      onMomentumScrollEnd={(e) => console.log("momentum end", e.nativeEvent)}
+
+
+      onScrollBeginDrag={() => (scrolled.current = true)}
+      onScrollEndDrag={() => (scrolled.current = false)}
+      onMomentumScrollEnd={() => (scrolled.current = false)}
+   */
   return (
     <ScrollView
       {...props}
@@ -224,9 +245,6 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
       ref={lrcRef}
       scrollEventThrottle={30}
       style={[style, { height }]}
-      onScrollBeginDrag={() => (scrolled.current = true)}
-      onScrollEndDrag={() => (scrolled.current = false)}
-      onMomentumScrollEnd={() => (scrolled.current = false)}
     >
       <View style={{ flex: 1 }}>
         {autoScroll ? (

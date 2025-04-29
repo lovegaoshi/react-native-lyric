@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View } from "react-native";
+import { Text, Pressable } from "react-native";
 
 import type { LrcLine } from "../constant";
 
@@ -50,6 +50,7 @@ interface StandardLrcLineProps {
   karaokeOnColor: string;
   karaokeOffColor: string;
   onViewLayout?: (e: any) => void;
+  onPress?: (l: LrcLine) => void;
 }
 const StandardLrcLine = function standardLrcLine({
   lrcLine,
@@ -59,16 +60,21 @@ const StandardLrcLine = function standardLrcLine({
   karaokeOffColor,
   onViewLayout,
   lineRenderer = defaultLineRenderer,
+  onPress,
 }: StandardLrcLineProps) {
   return (
-    <View key={lrcLine.id} onLayout={onViewLayout}>
+    <Pressable
+      key={lrcLine.id}
+      onLayout={onViewLayout}
+      onPress={() => onPress?.(lrcLine)}
+    >
       {lineRenderer({
         lrcLine,
         index,
         active: currentIndex === index,
         color: currentIndex === index ? karaokeOnColor : karaokeOffColor,
       })}
-    </View>
+    </Pressable>
   );
 };
 
