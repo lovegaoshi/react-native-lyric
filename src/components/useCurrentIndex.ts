@@ -1,6 +1,6 @@
-import {useState, useEffect} from 'react';
+import { useState, useEffect } from "react";
 
-import {LrcLine} from '../constant';
+import type { LrcLine } from "../constant";
 
 export default ({
   lrcLineList,
@@ -12,10 +12,10 @@ export default ({
   const [currentIndex, setCurrentIndex] = useState(-1);
 
   useEffect(() => {
-    const {length} = lrcLineList;
+    const { length } = lrcLineList;
     let i = 0;
     for (; i < length; i += 1) {
-      const {millisecond} = lrcLineList[i];
+      const { millisecond } = lrcLineList[i];
       if (currentTime < millisecond) {
         break;
       }

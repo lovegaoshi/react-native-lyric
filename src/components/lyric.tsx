@@ -1,28 +1,28 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {
-  useRef,
-  useImperativeHandle,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import { ScrollView, StyleProp, Text, View, ViewStyle } from "react-native";
-import MaskedView from "@react-native-masked-view/masked-view";
+import React, { useRef, useImperativeHandle, useEffect, useMemo } from "react";
+import {
+  ScrollView,
+  StyleProp,
+  View,
+  ViewStyle,
+  Pressable,
+} from "react-native";
 
 import {
   LrcLine,
   AUTO_SCROLL_AFTER_USER_SCROLL,
   KaraokeMode,
-  calcKaraokePercentage,
 } from "../constant";
-import useLrc from "../util/use_lrc";
-import useCurrentIndex from "./use_current_index";
-import useLocalAutoScroll from "./use_local_auto_scroll";
+import useLrc from "../util/useLrc";
+import useCurrentIndex from "./useCurrentIndex";
 import {
   defaultLineRenderer,
   LineRendererProps,
   MemoStandardLine,
 } from "./LrcLine";
+import { RealKaraokeLrcLine } from "./KLrcLine";
+import { FakeKaraokeLrcLine } from "./FakeKLrcLine";
+import { execWhenTrue } from "../util/utils";
 
 interface Props {
   /** lrc string */
@@ -47,9 +47,9 @@ interface Props {
   height: number;
   lineHeight: number;
   activeLineHeight: number;
-  noScrollThrottle?: boolean;
   showUnformatted?: boolean;
   onPress?: () => void;
+  onLinePress?: (l: LrcLine) => void;
   karaokeOnColor?: string;
   karaokeOffColor?: string;
   karaokeMode?: KaraokeMode;
@@ -57,101 +57,13 @@ interface Props {
 }
 
 interface LrcProps {
-  scrollToCurrentLine: () => void;
   getCurrentLine: () => {
     index: number;
     lrcLine: LrcLine | null;
   };
 }
 
-interface KareokeProps {
-  lrcLine: LrcLine;
-  index: number;
-  activeLineHeight: number;
-  lineRenderer: (props: LineRendererProps) => JSX.Element;
-  karaokeOnColor: string;
-  karaokeOffColor: string;
-  currentTime: number;
-  onViewLayout?: (e: any) => void;
-}
-
-const RealKaraokeLrcLine = ({
-  lrcLine,
-  index,
-  activeLineHeight,
-  lineRenderer,
-  karaokeOnColor,
-  karaokeOffColor,
-  currentTime,
-  onViewLayout,
-}: KareokeProps) => {
-  const [karaokeWidths, setKaraokeWidths] = useState<Array<number | undefined>>(
-    []
-  );
-
-  return (
-    <View
-      onLayout={onViewLayout}
-      key={lrcLine.id}
-      style={{
-        flexDirection: "row",
-        width: "100%",
-        justifyContent: "center",
-        flexWrap: "wrap",
-        alignItems: "flex-start",
-      }}
-    >
-      {lrcLine.karaokeLines?.map((karaokeLine, karaokeIndex) => (
-        <MaskedView
-          key={`${lrcLine.id}.${karaokeIndex}`}
-          style={{
-            flexDirection: "row",
-            height: activeLineHeight,
-            width: karaokeWidths[karaokeIndex] ?? 0,
-          }}
-          maskElement={lineRenderer({
-            lrcLine: { content: karaokeLine.content },
-            index,
-            active: true,
-            color: "white",
-          })}
-        >
-          <View
-            style={{
-              width: `${calcKaraokePercentage(currentTime, karaokeLine)}%`,
-              backgroundColor: karaokeOnColor,
-            }}
-          />
-          <View
-            style={{
-              width: `${
-                100 - calcKaraokePercentage(currentTime, karaokeLine)
-              }%`,
-              backgroundColor: karaokeOffColor,
-            }}
-          />
-        </MaskedView>
-      ))}
-      {lrcLine.karaokeLines?.map((karaokeLine, karaokeIndex) =>
-        lineRenderer({
-          lrcLine: { content: karaokeLine.content },
-          index: karaokeIndex,
-          active: true,
-          onLayout: (e) =>
-            setKaraokeWidths((v) => {
-              v[karaokeIndex] = e?.nativeEvent?.layout?.width;
-              return v;
-            }),
-          keyPrefix: "karaokeFakeLine",
-          color: karaokeOffColor,
-          hidden: karaokeWidths[0] !== undefined,
-        })
-      )}
-    </View>
-  );
-};
-
-// @ts-expect-error eslint-disable-next-line no-spaced-func
+// @ts-expect-error
 const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   {
     lrc,
@@ -164,9 +76,9 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     onCurrentLineChange,
     height = 500,
     style,
-    noScrollThrottle,
     showUnformatted = true,
     onPress,
+    onLinePress,
     karaokeOffColor = "gray",
     karaokeOnColor = "white",
     karaokeMode = KaraokeMode.NoKaraoke,
@@ -175,34 +87,39 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   ref
 ) {
   const lrcRef = useRef<ScrollView>(null);
-  const locationX = useRef(0);
   const lrcLineList = useLrc(lrc, showUnformatted);
-  const scrolled = useRef(false);
   const lrcHeights = useRef<number[]>([]);
+  const scrolled = useRef(false);
 
   const currentIndex = useCurrentIndex({ lrcLineList, currentTime });
-  const { localAutoScroll, resetLocalAutoScroll, onScroll } =
-    useLocalAutoScroll({
-      autoScroll,
-      autoScrollAfterUserScroll,
-    });
   const karaokeWidths = useRef<Array<number | undefined>>([undefined]);
 
   useEffect(() => {
     karaokeWidths.current = [undefined];
   }, [currentIndex]);
 
+  const scrollToReal = () =>
+    lrcRef.current?.scrollTo({
+      y: lrcHeights.current[currentIndex] - height / 2,
+      animated: true,
+    });
+
+  const scrollToFake = () =>
+    lrcRef.current?.scrollTo({
+      y: currentIndex * lineHeight || 0,
+      animated: true,
+    });
+
   // auto scroll
   useEffect(() => {
-    if (noScrollThrottle || localAutoScroll) {
-      lrcRef.current?.scrollTo({
-        y: lrcHeights.current[currentIndex]
-          ? lrcHeights.current[currentIndex] - height / 2
-          : currentIndex * lineHeight || 0,
-        animated: true,
+    if (autoScroll && scrolled.current === false) {
+      execWhenTrue({
+        loopCheck: async () => lrcHeights.current[currentIndex] !== undefined,
+        executeFn: scrollToReal,
+        catchFn: scrollToFake,
       });
     }
-  }, [currentIndex, localAutoScroll, lineHeight]);
+  }, [currentIndex, lineHeight]);
 
   // on current line change
   useEffect(() => {
@@ -217,69 +134,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
       index: currentIndex,
       lrcLine: lrcLineList[currentIndex] || null,
     }),
-    scrollToCurrentLine: () => {
-      resetLocalAutoScroll();
-      lrcRef.current?.scrollTo({
-        y: lrcHeights.current[currentIndex]
-          ? lrcHeights.current[currentIndex] - height / 2
-          : currentIndex * lineHeight || 0,
-        animated: true,
-      });
-    },
   }));
-
-  const calculateKaraokeLrcLineProgress = (lrcLine: LrcLine, index: number) => {
-    if (currentIndex === index && lrcLine.duration) {
-      return (currentTime - lrcLine.millisecond) / lrcLine.duration;
-    } else {
-      return 0;
-    }
-  };
-
-  const karaokeLrcLine = (lrcLine: LrcLine, index: number) => {
-    const karaokeProgress = calculateKaraokeLrcLineProgress(lrcLine, index);
-
-    return (
-      <MaskedView
-        onLayout={(e) => (lrcHeights.current[index] = e.nativeEvent.layout.y)}
-        key={lrcLine.id}
-        style={{
-          flex: 1,
-          flexDirection: "row",
-          height: activeLineHeight,
-        }}
-        maskElement={lineRenderer({
-          lrcLine,
-          index,
-          active: true,
-        })}
-      >
-        {lrcLine.duration ? (
-          <>
-            <View
-              style={{
-                width: `${karaokeProgress * 100}%`,
-                backgroundColor: karaokeOnColor,
-              }}
-            />
-            <View
-              style={{
-                width: `${(1 - karaokeProgress) * 100}%`,
-                backgroundColor: karaokeOffColor,
-              }}
-            />
-          </>
-        ) : (
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: karaokeOnColor,
-            }}
-          />
-        )}
-      </MaskedView>
-    );
-  };
 
   const lyricNodeList = useMemo(
     () =>
@@ -317,8 +172,24 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
         onViewLayout={(e) =>
           (lrcHeights.current[index] = e.nativeEvent.layout.y)
         }
+        onPress={onLinePress}
       />
     );
+
+    const FakeKaraokeLine = () => (
+      <FakeKaraokeLrcLine
+        currentIndex={currentIndex}
+        currentTime={currentTime}
+        index={index}
+        lrcLine={lrcLine}
+        lrcHeights={lrcHeights}
+        activeLineHeight={activeLineHeight}
+        lineRenderer={lineRenderer}
+        karaokeOffColor={karaokeOffColor}
+        karaokeOnColor={karaokeOnColor}
+      />
+    );
+
     if (currentIndex !== index) {
       return defaultLine();
     }
@@ -342,7 +213,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
           defaultLine()
         );
       case KaraokeMode.FakeKaraoke:
-        return karaokeLrcLine(lrcLine, index);
+        return <FakeKaraokeLine />;
       case KaraokeMode.Karaoke:
         return lrcLine.karaokeLines ? (
           <RealKaraokeLrcLine
@@ -359,7 +230,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
             }
           />
         ) : (
-          karaokeLrcLine(lrcLine, index)
+          <FakeKaraokeLine />
         );
       case KaraokeMode.NoKaraoke:
       default:
@@ -367,25 +238,35 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     }
   };
 
+  /**
+   * need to investigate wtf is going on.
+   * on a scrollTo event, momentumBegin is called; then onScroll; then nothing else.
+   * on a scroll vent, scrollBegin is called, then momentumEnd. 
+   * if either momentum events are registered, pressable wont work until momentumEnd 
+   * emits (via manual scrolling)
+   * TODO: retest this in RN 0.79
+   * 
+      onScrollBeginDrag={(e) => console.log("scroll begin ", e.nativeEvent)}
+      onScrollEndDrag={(e) => console.log("scroll end ", e.nativeEvent)}
+      onMomentumScrollBegin={(e) =>
+        console.log("momentum begin ", e.nativeEvent)
+      }
+      onMomentumScrollEnd={(e) => console.log("momentum end", e.nativeEvent)}
+
+
+      onScrollBeginDrag={() => (scrolled.current = true)}
+      onScrollEndDrag={() => (scrolled.current = false)}
+      onMomentumScrollEnd={() => (scrolled.current = false)}
+   */
   return (
     <ScrollView
       {...props}
       showsVerticalScrollIndicator={false}
       ref={lrcRef}
       scrollEventThrottle={30}
-      onScroll={onScroll}
       style={[style, { height }]}
-      onScrollBeginDrag={() => (scrolled.current = true)}
-      onScrollEndDrag={() => (scrolled.current = false)}
-      onMomentumScrollEnd={() => (scrolled.current = false)}
-      onTouchStart={(e) => (locationX.current = e.nativeEvent.locationX)}
-      onTouchEnd={(e) =>
-        Math.abs(locationX.current - e.nativeEvent.locationX) < 5 &&
-        !scrolled.current &&
-        onPress?.()
-      }
     >
-      <View style={{ flex: 1 }}>
+      <Pressable style={{ flex: 1 }} onPress={onPress}>
         {autoScroll ? (
           <View style={{ width: "100%", height: 0.45 * height }} />
         ) : null}
@@ -395,7 +276,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
         {autoScroll ? (
           <View style={{ width: "100%", height: 0.5 * height }} />
         ) : null}
-      </View>
+      </Pressable>
     </ScrollView>
   );
 });

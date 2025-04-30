@@ -1,5 +1,5 @@
 import type { LrcLine } from "../../constant";
-import getRandomString from "../get_random_string";
+import getRandomString from "../getRandomString";
 import parse from "./parseHelper";
 
 // [此行开始时刻距0时刻的毫秒数,此行持续的毫秒数]<0,此字持续的毫秒数,0>歌<此字开始的时刻距此行开始时刻的毫秒数,此字持续的毫秒数,0>词<此字开始的时刻距此行开始时刻的毫秒数,此字持续的毫秒数,0>正<此字开始的时刻距此行开始时刻的毫秒数,此字持续的毫秒数,0>文
