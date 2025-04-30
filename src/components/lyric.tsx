@@ -22,6 +22,7 @@ import {
 } from "./LrcLine";
 import { RealKaraokeLrcLine } from "./KLrcLine";
 import { FakeKaraokeLrcLine } from "./FakeKLrcLine";
+import { execWhenTrue } from "../util/utils";
 
 interface Props {
   /** lrc string */
@@ -97,14 +98,25 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     karaokeWidths.current = [undefined];
   }, [currentIndex]);
 
+  const scrollToReal = () =>
+    lrcRef.current?.scrollTo({
+      y: lrcHeights.current[currentIndex] - height / 2,
+      animated: true,
+    });
+
+  const scrollToFake = () =>
+    lrcRef.current?.scrollTo({
+      y: currentIndex * lineHeight || 0,
+      animated: true,
+    });
+
   // auto scroll
   useEffect(() => {
     if (autoScroll && scrolled.current === false) {
-      lrcRef.current?.scrollTo({
-        y: lrcHeights.current[currentIndex]
-          ? lrcHeights.current[currentIndex] - height / 2
-          : currentIndex * lineHeight || 0,
-        animated: true,
+      execWhenTrue({
+        loopCheck: async () => lrcHeights.current[currentIndex] !== undefined,
+        executeFn: scrollToReal,
+        catchFn: scrollToFake,
       });
     }
   }, [currentIndex, lineHeight]);
