@@ -68,10 +68,10 @@ const StandardLrcLine = function standardLrcLine({
         flexDirection: "row",
         justifyContent: "center",
       }}
+      onLayout={onViewLayout}
     >
       <Pressable
         key={lrcLine.id}
-        onLayout={onViewLayout}
         onPress={() => onPress?.(lrcLine)}
         onStartShouldSetResponder={() => true}
       >
