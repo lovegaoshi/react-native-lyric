@@ -112,7 +112,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
 
   // auto scroll
   useEffect(() => {
-    if (autoScroll && scrolled.current === false) {
+    if (autoScroll && scrolled.current === false && currentIndex > 0) {
       execWhenTrue({
         loopCheck: async () => lrcHeights.current[currentIndex] !== undefined,
         executeFn: scrollToReal,
