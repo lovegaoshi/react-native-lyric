@@ -7,28 +7,18 @@ import parse from "./parseHelper";
 const PrefixTimestampRegex = /\[\d+,\d+\]/;
 const KaraokeTimestampRegex = /<(\d+),(\d+),(\d+)>/g;
 
-interface Props {
-  lrc: string;
-  prefixTimestampRegex: RegExp;
-  karaokeTimestampRegex: RegExp;
-}
-
-export const generalParser = ({
-  lrc,
-  prefixTimestampRegex,
-  karaokeTimestampRegex,
-}: Props): [LrcLine[], string[]] => {
+export default (lrc: string, showUnformatted = true): LrcLine[] => {
   const lrcLineList: LrcLine[] = [];
   const unformattedLrc: string[] = [];
   const lineList = lrc.split("\n");
   lineList.forEach((line) => {
-    const parsedLineTimestamp = line.match(prefixTimestampRegex);
+    const parsedLineTimestamp = line.match(PrefixTimestampRegex);
     if (!parsedLineTimestamp) {
       unformattedLrc.push(line);
       return;
     }
     const [millisecond, duration] = JSON.parse(parsedLineTimestamp[0]);
-    const karaokeTimestamps = Array.from(line.matchAll(karaokeTimestampRegex));
+    const karaokeTimestamps = Array.from(line.matchAll(KaraokeTimestampRegex));
     const karaokeLines = karaokeTimestamps.map((karaoke, index) => {
       const [_, karaokeStartTime, karaokeDuration] = karaoke;
       const text = line.substring(
@@ -48,15 +38,6 @@ export const generalParser = ({
       content: karaokeLines.reduce((acc, curr) => acc + curr.content, ""),
       karaokeLines,
     });
-  });
-  return [lrcLineList, unformattedLrc];
-};
-
-export default (lrc: string, showUnformatted = true): LrcLine[] => {
-  const [lrcLineList, unformattedLrc] = generalParser({
-    lrc,
-    prefixTimestampRegex: PrefixTimestampRegex,
-    karaokeTimestampRegex: KaraokeTimestampRegex,
   });
   return parse(lrcLineList, unformattedLrc, showUnformatted);
 };
