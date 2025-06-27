@@ -53,6 +53,7 @@ interface Props {
   karaokeOnColor?: string;
   karaokeOffColor?: string;
   karaokeMode?: KaraokeMode;
+  fontScale?: number;
   [key: string]: any;
 }
 
@@ -82,10 +83,13 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     karaokeOffColor = "gray",
     karaokeOnColor = "white",
     karaokeMode = KaraokeMode.NoKaraoke,
+    fontScale = 1,
     ...props
   }: Props,
   ref
 ) {
+  lineHeight *= fontScale;
+  activeLineHeight *= fontScale;
   const lrcRef = useRef<ScrollView>(null);
   const lrcLineList = useLrc(lrc, showUnformatted);
   const lrcHeights = useRef<number[]>([]);
@@ -140,6 +144,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     () =>
       lrcLineList.map((lrcLine, index) => (
         <MemoStandardLine
+          fontScale={fontScale}
           key={`${lrcLine.id}.standard.${index}`}
           lrcLine={lrcLine}
           index={index}
@@ -160,6 +165,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   const determineKaraokeMode = (lrcLine: LrcLine, index: number) => {
     const defaultLine = () => (
       <MemoStandardLine
+        fontScale={fontScale}
         key={`${lrcLine.id}.standard.${index}`}
         lrcLine={lrcLine}
         index={index}
@@ -178,6 +184,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
 
     const FakeKaraokeLine = () => (
       <FakeKaraokeLrcLine
+        fontScale={fontScale}
         currentIndex={currentIndex}
         currentTime={currentTime}
         index={index}
@@ -197,6 +204,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
       case KaraokeMode.OnlyRealKaraoke:
         return lrcLine.karaokeLines ? (
           <RealKaraokeLrcLine
+            fontScale={fontScale}
             key={`${lrcLine.id}.real.${index}`}
             currentTime={currentTime}
             lrcLine={lrcLine}
@@ -217,6 +225,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
       case KaraokeMode.Karaoke:
         return lrcLine.karaokeLines ? (
           <RealKaraokeLrcLine
+            fontScale={fontScale}
             key={`${lrcLine.id}.real.${index}`}
             currentTime={currentTime}
             lrcLine={lrcLine}

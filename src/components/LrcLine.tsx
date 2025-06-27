@@ -11,6 +11,7 @@ export interface LineRendererProps {
   onLayout?: (e: any) => void;
   keyPrefix?: string;
   hidden?: boolean;
+  fontScale?: number;
 }
 
 export const defaultLineRenderer = ({
@@ -21,6 +22,7 @@ export const defaultLineRenderer = ({
   index,
   keyPrefix = "lyric",
   hidden = false,
+  fontScale = 1,
 }: LineRendererProps) => (
   <Text
     key={`${keyPrefix}.${index}`}
@@ -29,7 +31,7 @@ export const defaultLineRenderer = ({
       paddingVertical: 4,
       textAlign: "center",
       color,
-      fontSize: active ? 16 : 14,
+      fontSize: active ? 16 * fontScale : 14 * fontScale,
       opacity: hidden ? 0 : active ? 1 : 0.8,
       fontWeight: active ? "500" : "400",
       position: hidden ? "absolute" : undefined,
@@ -51,6 +53,7 @@ interface StandardLrcLineProps {
   karaokeOffColor: string;
   onViewLayout?: (e: any) => void;
   onPress?: (l: LrcLine) => void;
+  fontScale?: number;
 }
 const StandardLrcLine = function standardLrcLine({
   lrcLine,
@@ -61,6 +64,7 @@ const StandardLrcLine = function standardLrcLine({
   onViewLayout,
   lineRenderer = defaultLineRenderer,
   onPress,
+  fontScale,
 }: StandardLrcLineProps) {
   return (
     <View
@@ -76,6 +80,7 @@ const StandardLrcLine = function standardLrcLine({
         onStartShouldSetResponder={() => true}
       >
         {lineRenderer({
+          fontScale,
           lrcLine,
           index,
           active: currentIndex === index,

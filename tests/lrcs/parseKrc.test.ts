@@ -3,5 +3,5 @@ import KGKRC from "../krc";
 
 test("parse krc", () => {
   const content = parseKrc(KGKRC);
-  expect(content).not.toBe(undefined);
+  expect(content[0].karaokeLines?.length ?? 0).toBeGreaterThan(0);
 });

@@ -4,6 +4,8 @@ import getRandomString from "../getRandomString";
 export enum Source {
   Lrc = "Lrc",
   Krc = "Krc",
+  Qrc = "Qrc",
+  Yrc = "Yrc",
 }
 
 export default (
@@ -20,6 +22,8 @@ export default (
       }))
     : sortedLrcs.map((lrcLine, i) => ({
         ...lrcLine,
-        duration: lrcLineList[i + 1]?.millisecond - lrcLine.millisecond,
+        duration:
+          lrcLine.duration ??
+          lrcLineList[i + 1]?.millisecond - lrcLine.millisecond,
       }));
 };

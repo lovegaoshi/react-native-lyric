@@ -19,6 +19,7 @@ interface Props extends LrcPositionProps {
   activeLineHeight: number;
   karaokeOnColor: string;
   karaokeOffColor: string;
+  fontScale?: number;
 }
 
 const calculateKaraokeLrcLineProgress = ({
@@ -44,6 +45,7 @@ export const FakeKaraokeLrcLine = ({
   lineRenderer,
   karaokeOffColor,
   karaokeOnColor,
+  fontScale,
 }: Props) => {
   const karaokeProgress = calculateKaraokeLrcLineProgress({
     currentIndex,
@@ -62,6 +64,7 @@ export const FakeKaraokeLrcLine = ({
         height: activeLineHeight,
       }}
       maskElement={lineRenderer({
+        fontScale,
         lrcLine,
         index,
         active: true,
