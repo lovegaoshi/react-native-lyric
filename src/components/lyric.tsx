@@ -83,11 +83,13 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     karaokeOffColor = "gray",
     karaokeOnColor = "white",
     karaokeMode = KaraokeMode.NoKaraoke,
-    fontScale,
+    fontScale = 1,
     ...props
   }: Props,
   ref
 ) {
+  lineHeight *= fontScale;
+  activeLineHeight *= fontScale;
   const lrcRef = useRef<ScrollView>(null);
   const lrcLineList = useLrc(lrc, showUnformatted);
   const lrcHeights = useRef<number[]>([]);
