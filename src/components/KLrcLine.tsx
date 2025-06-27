@@ -15,6 +15,7 @@ interface KareokeProps {
   karaokeOffColor: string;
   currentTime: number;
   onViewLayout?: (e: any) => void;
+  fontScale?: number;
 }
 
 export const RealKaraokeLrcLine = ({
@@ -26,6 +27,7 @@ export const RealKaraokeLrcLine = ({
   karaokeOffColor,
   currentTime,
   onViewLayout,
+  fontScale,
 }: KareokeProps) => {
   const [karaokeWidths, setKaraokeWidths] = useState<Array<number | undefined>>(
     []
@@ -52,6 +54,7 @@ export const RealKaraokeLrcLine = ({
             width: karaokeWidths[karaokeIndex] ?? 0,
           }}
           maskElement={lineRenderer({
+            fontScale,
             lrcLine: { content: karaokeLine.content },
             index,
             active: true,
@@ -76,6 +79,7 @@ export const RealKaraokeLrcLine = ({
       ))}
       {lrcLine.karaokeLines?.map((karaokeLine, karaokeIndex) =>
         lineRenderer({
+          fontScale,
           lrcLine: { content: karaokeLine.content },
           index: karaokeIndex,
           active: true,
