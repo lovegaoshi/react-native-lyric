@@ -13,6 +13,8 @@ export interface LineRendererProps {
   hidden?: boolean;
   fontScale?: number;
   align?: "left" | "center" | "right";
+  fontSize?: number;
+  activeFontSize?: number;
 }
 
 export const defaultLineRenderer = ({
@@ -25,6 +27,8 @@ export const defaultLineRenderer = ({
   hidden = false,
   fontScale = 1,
   align = "center",
+  fontSize = 14,
+  activeFontSize = 16,
 }: LineRendererProps) => (
   <Text
     key={`${keyPrefix}.${index}`}
@@ -33,7 +37,7 @@ export const defaultLineRenderer = ({
       paddingVertical: 4,
       textAlign: align,
       color,
-      fontSize: active ? 16 * fontScale : 14 * fontScale,
+      fontSize: active ? activeFontSize * fontScale : fontSize * fontScale,
       opacity: hidden ? 0 : active ? 1 : 0.8,
       fontWeight: active ? "500" : "400",
       position: hidden ? "absolute" : undefined,
