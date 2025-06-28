@@ -54,6 +54,7 @@ interface Props {
   karaokeOffColor?: string;
   karaokeMode?: KaraokeMode;
   fontScale?: number;
+  align?: "left" | "center" | "right";
   [key: string]: any;
 }
 
@@ -84,6 +85,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     karaokeOnColor = "white",
     karaokeMode = KaraokeMode.NoKaraoke,
     fontScale = 1,
+    align = "center",
     ...props
   }: Props,
   ref
@@ -144,6 +146,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     () =>
       lrcLineList.map((lrcLine, index) => (
         <MemoStandardLine
+          align={align}
           fontScale={fontScale}
           key={`${lrcLine.id}.standard.${index}`}
           lrcLine={lrcLine}
@@ -165,6 +168,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   const determineKaraokeMode = (lrcLine: LrcLine, index: number) => {
     const defaultLine = () => (
       <MemoStandardLine
+        align={align}
         fontScale={fontScale}
         key={`${lrcLine.id}.standard.${index}`}
         lrcLine={lrcLine}
@@ -184,6 +188,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
 
     const FakeKaraokeLine = () => (
       <FakeKaraokeLrcLine
+        align={align}
         fontScale={fontScale}
         currentIndex={currentIndex}
         currentTime={currentTime}
@@ -204,6 +209,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
       case KaraokeMode.OnlyRealKaraoke:
         return lrcLine.karaokeLines ? (
           <RealKaraokeLrcLine
+            align={align}
             fontScale={fontScale}
             key={`${lrcLine.id}.real.${index}`}
             currentTime={currentTime}
@@ -225,6 +231,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
       case KaraokeMode.Karaoke:
         return lrcLine.karaokeLines ? (
           <RealKaraokeLrcLine
+            align={align}
             fontScale={fontScale}
             key={`${lrcLine.id}.real.${index}`}
             currentTime={currentTime}

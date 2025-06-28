@@ -16,6 +16,7 @@ interface KareokeProps {
   currentTime: number;
   onViewLayout?: (e: any) => void;
   fontScale?: number;
+  align?: "left" | "center" | "right";
 }
 
 export const RealKaraokeLrcLine = ({
@@ -28,6 +29,7 @@ export const RealKaraokeLrcLine = ({
   currentTime,
   onViewLayout,
   fontScale,
+  align = "center",
 }: KareokeProps) => {
   const [karaokeWidths, setKaraokeWidths] = useState<Array<number | undefined>>(
     []
@@ -40,7 +42,7 @@ export const RealKaraokeLrcLine = ({
       style={{
         flexDirection: "row",
         width: "100%",
-        justifyContent: "center",
+        justifyContent: align,
         flexWrap: "wrap",
         alignItems: "flex-start",
       }}
@@ -54,6 +56,7 @@ export const RealKaraokeLrcLine = ({
             width: karaokeWidths[karaokeIndex] ?? 0,
           }}
           maskElement={lineRenderer({
+            align,
             fontScale,
             lrcLine: { content: karaokeLine.content },
             index,
@@ -79,6 +82,7 @@ export const RealKaraokeLrcLine = ({
       ))}
       {lrcLine.karaokeLines?.map((karaokeLine, karaokeIndex) =>
         lineRenderer({
+          align,
           fontScale,
           lrcLine: { content: karaokeLine.content },
           index: karaokeIndex,
