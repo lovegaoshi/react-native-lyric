@@ -54,6 +54,7 @@ interface Props extends LrcCommonProps {
   karaokeOnColor?: string;
   karaokeOffColor?: string;
   karaokeMode?: KaraokeMode;
+  lapsedAsActiveColor?: boolean;
   [key: string]: any;
 }
 
@@ -87,6 +88,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     activeFontSize = 16,
     lineHeight = fontSize + 12,
     activeLineHeight = activeFontSize + 12,
+    lapsedAsActiveColor,
     ...props
   }: Props,
   ref
@@ -149,6 +151,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     () =>
       lrcLineList.map((lrcLine, index) => (
         <MemoStandardLine
+          lapsedAsActiveColor={lapsedAsActiveColor}
           fontSize={fontSize}
           activeFontSize={activeFontSize}
           align={align}
@@ -173,6 +176,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   const determineKaraokeMode = (lrcLine: LrcLine, index: number) => {
     const defaultLine = () => (
       <MemoStandardLine
+        lapsedAsActiveColor={lapsedAsActiveColor}
         fontSize={fontSize}
         activeFontSize={activeFontSize}
         align={align}

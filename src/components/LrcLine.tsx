@@ -55,6 +55,7 @@ interface StandardLrcLineProps extends LrcCommonProps {
   karaokeOffColor: string;
   onViewLayout?: (e: any) => void;
   onPress?: (l: LrcLine) => void;
+  lapsedAsActiveColor?: boolean;
 }
 const StandardLrcLine = function standardLrcLine({
   lrcLine,
@@ -69,7 +70,11 @@ const StandardLrcLine = function standardLrcLine({
   align = "center",
   fontSize,
   activeFontSize,
+  lapsedAsActiveColor,
 }: StandardLrcLineProps) {
+  const isActiveColor = lapsedAsActiveColor
+    ? currentIndex >= index
+    : currentIndex === index;
   return (
     <View
       style={{
@@ -91,7 +96,7 @@ const StandardLrcLine = function standardLrcLine({
           lrcLine,
           index,
           active: currentIndex === index,
-          color: currentIndex === index ? karaokeOnColor : karaokeOffColor,
+          color: isActiveColor ? karaokeOnColor : karaokeOffColor,
         })}
       </Pressable>
     </View>
