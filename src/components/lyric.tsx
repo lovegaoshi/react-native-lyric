@@ -23,8 +23,9 @@ import {
 import { RealKaraokeLrcLine } from "./KLrcLine";
 import { FakeKaraokeLrcLine } from "./FakeKLrcLine";
 import { execWhenTrue } from "../util/utils";
+import type { LrcCommonProps } from "./LrcProps";
 
-interface Props {
+interface Props extends LrcCommonProps {
   /** lrc string */
   lrc: string;
   /** lrc line render */
@@ -53,8 +54,6 @@ interface Props {
   karaokeOnColor?: string;
   karaokeOffColor?: string;
   karaokeMode?: KaraokeMode;
-  fontScale?: number;
-  align?: "left" | "center" | "right";
   [key: string]: any;
 }
 
@@ -72,8 +71,6 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     lineRenderer = defaultLineRenderer,
     currentTime = 0,
     autoScroll = true,
-    lineHeight = 26,
-    activeLineHeight = lineHeight,
     autoScrollAfterUserScroll = AUTO_SCROLL_AFTER_USER_SCROLL,
     onCurrentLineChange,
     height = 500,
@@ -86,12 +83,18 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     karaokeMode = KaraokeMode.NoKaraoke,
     fontScale = 1,
     align = "center",
+    fontSize = 14,
+    activeFontSize = 16,
+    lineHeight = fontSize + 12,
+    activeLineHeight = activeFontSize + 12,
     ...props
   }: Props,
   ref
 ) {
   lineHeight *= fontScale;
   activeLineHeight *= fontScale;
+  fontSize *= fontScale;
+  activeFontSize *= fontScale;
   const lrcRef = useRef<ScrollView>(null);
   const lrcLineList = useLrc(lrc, showUnformatted);
   const lrcHeights = useRef<number[]>([]);
@@ -146,6 +149,8 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     () =>
       lrcLineList.map((lrcLine, index) => (
         <MemoStandardLine
+          fontSize={fontSize}
+          activeFontSize={activeFontSize}
           align={align}
           fontScale={fontScale}
           key={`${lrcLine.id}.standard.${index}`}
@@ -168,6 +173,8 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   const determineKaraokeMode = (lrcLine: LrcLine, index: number) => {
     const defaultLine = () => (
       <MemoStandardLine
+        fontSize={fontSize}
+        activeFontSize={activeFontSize}
         align={align}
         fontScale={fontScale}
         key={`${lrcLine.id}.standard.${index}`}
@@ -188,6 +195,8 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
 
     const FakeKaraokeLine = () => (
       <FakeKaraokeLrcLine
+        fontSize={fontSize}
+        activeFontSize={activeFontSize}
         align={align}
         fontScale={fontScale}
         currentIndex={currentIndex}
@@ -209,6 +218,8 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
       case KaraokeMode.OnlyRealKaraoke:
         return lrcLine.karaokeLines ? (
           <RealKaraokeLrcLine
+            fontSize={fontSize}
+            activeFontSize={activeFontSize}
             align={align}
             fontScale={fontScale}
             key={`${lrcLine.id}.real.${index}`}
@@ -231,6 +242,8 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
       case KaraokeMode.Karaoke:
         return lrcLine.karaokeLines ? (
           <RealKaraokeLrcLine
+            fontSize={fontSize}
+            activeFontSize={activeFontSize}
             align={align}
             fontScale={fontScale}
             key={`${lrcLine.id}.real.${index}`}

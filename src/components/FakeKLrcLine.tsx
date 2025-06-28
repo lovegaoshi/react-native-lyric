@@ -5,6 +5,7 @@ import MaskedView from "@react-native-masked-view/masked-view";
 
 import type { LrcLine } from "../constant";
 import type { LineRendererProps } from "./LrcLine";
+import type { LrcCommonProps } from "./LrcProps";
 
 interface LrcPositionProps {
   currentIndex: number;
@@ -13,14 +14,12 @@ interface LrcPositionProps {
   index: number;
 }
 
-interface Props extends LrcPositionProps {
+interface Props extends LrcPositionProps, LrcCommonProps {
   lineRenderer: (props: LineRendererProps) => JSX.Element;
   lrcHeights: React.MutableRefObject<number[]>;
   activeLineHeight: number;
   karaokeOnColor: string;
   karaokeOffColor: string;
-  fontScale?: number;
-  align?: "left" | "center" | "right";
 }
 
 const calculateKaraokeLrcLineProgress = ({
@@ -48,6 +47,8 @@ export const FakeKaraokeLrcLine = ({
   karaokeOnColor,
   fontScale,
   align,
+  fontSize,
+  activeFontSize,
 }: Props) => {
   const karaokeProgress = calculateKaraokeLrcLineProgress({
     currentIndex,
@@ -66,6 +67,8 @@ export const FakeKaraokeLrcLine = ({
         height: activeLineHeight,
       }}
       maskElement={lineRenderer({
+        fontSize,
+        activeFontSize,
         align,
         fontScale,
         lrcLine,

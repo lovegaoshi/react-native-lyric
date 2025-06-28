@@ -2,8 +2,9 @@ import React from "react";
 import { Text, Pressable, View } from "react-native";
 
 import type { LrcLine } from "../constant";
+import type { LrcCommonProps } from "./LrcProps";
 
-export interface LineRendererProps {
+export interface LineRendererProps extends LrcCommonProps {
   lrcLine: { content: string };
   active: boolean;
   color?: string;
@@ -11,10 +12,6 @@ export interface LineRendererProps {
   onLayout?: (e: any) => void;
   keyPrefix?: string;
   hidden?: boolean;
-  fontScale?: number;
-  align?: "left" | "center" | "right";
-  fontSize?: number;
-  activeFontSize?: number;
 }
 
 export const defaultLineRenderer = ({
@@ -25,7 +22,6 @@ export const defaultLineRenderer = ({
   index,
   keyPrefix = "lyric",
   hidden = false,
-  fontScale = 1,
   align = "center",
   fontSize = 14,
   activeFontSize = 16,
@@ -37,7 +33,7 @@ export const defaultLineRenderer = ({
       paddingVertical: 4,
       textAlign: align,
       color,
-      fontSize: active ? activeFontSize * fontScale : fontSize * fontScale,
+      fontSize: active ? activeFontSize : fontSize,
       opacity: hidden ? 0 : active ? 1 : 0.8,
       fontWeight: active ? "500" : "400",
       position: hidden ? "absolute" : undefined,
@@ -48,7 +44,7 @@ export const defaultLineRenderer = ({
   </Text>
 );
 
-interface StandardLrcLineProps {
+interface StandardLrcLineProps extends LrcCommonProps {
   lrcLine: LrcLine;
   index: number;
   currentIndex: number;
@@ -59,8 +55,6 @@ interface StandardLrcLineProps {
   karaokeOffColor: string;
   onViewLayout?: (e: any) => void;
   onPress?: (l: LrcLine) => void;
-  fontScale?: number;
-  align?: "left" | "center" | "right";
 }
 const StandardLrcLine = function standardLrcLine({
   lrcLine,
@@ -73,6 +67,8 @@ const StandardLrcLine = function standardLrcLine({
   onPress,
   fontScale,
   align = "center",
+  fontSize,
+  activeFontSize,
 }: StandardLrcLineProps) {
   return (
     <View
@@ -88,6 +84,8 @@ const StandardLrcLine = function standardLrcLine({
         onStartShouldSetResponder={() => true}
       >
         {lineRenderer({
+          fontSize,
+          activeFontSize,
           align,
           fontScale,
           lrcLine,
