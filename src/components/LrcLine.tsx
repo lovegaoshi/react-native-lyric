@@ -79,7 +79,7 @@ const StandardLrcLine = function standardLrcLine({
     <View
       style={{
         flexDirection: "row",
-        justifyContent: align,
+        justifyContent: align === 'center' ? 'center' : undefined,
       }}
       onLayout={onViewLayout}
     >

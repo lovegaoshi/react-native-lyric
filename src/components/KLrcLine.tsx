@@ -43,7 +43,7 @@ export const RealKaraokeLrcLine = ({
       style={{
         flexDirection: "row",
         width: "100%",
-        justifyContent: align,
+        justifyContent: align === "center" ? "center" : undefined,
         flexWrap: "wrap",
         alignItems: "flex-start",
       }}
