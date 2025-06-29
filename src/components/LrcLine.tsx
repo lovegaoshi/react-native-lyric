@@ -110,6 +110,9 @@ const propsEqual = (
   const propKeys = Object.keys(oldProps) as unknown as Array<
     keyof StandardLrcLineProps
   >;
+  // if lapsedAsActiveColor is on, color should be updated on every currentIndex update
+  const lapsedColorUpdate = newProps.lapsedAsActiveColor && oldProps.currentIndex !== newProps.currentIndex;
+  if (lapsedColorUpdate) return false;
   // if all keys other than currentIndex are the same,
   // as well as index === currentIndex does not change,
   // they are the same
