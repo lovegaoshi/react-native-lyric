@@ -30,7 +30,6 @@ export const defaultLineRenderer = ({
     key={`${keyPrefix}.${index}`}
     onLayout={onLayout}
     style={{
-      paddingVertical: 4,
       textAlign: align,
       color,
       fontSize: active ? activeFontSize : fontSize,
@@ -79,7 +78,7 @@ const StandardLrcLine = function standardLrcLine({
     <View
       style={{
         flexDirection: "row",
-        justifyContent: align === 'center' ? 'center' : undefined,
+        justifyContent: align === "center" ? "center" : undefined,
       }}
       onLayout={onViewLayout}
     >
@@ -111,7 +110,9 @@ const propsEqual = (
     keyof StandardLrcLineProps
   >;
   // if lapsedAsActiveColor is on, color should be updated on every currentIndex update
-  const lapsedColorUpdate = newProps.lapsedAsActiveColor && oldProps.currentIndex !== newProps.currentIndex;
+  const lapsedColorUpdate =
+    newProps.lapsedAsActiveColor &&
+    oldProps.currentIndex !== newProps.currentIndex;
   if (lapsedColorUpdate) return false;
   // if all keys other than currentIndex are the same,
   // as well as index === currentIndex does not change,

@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { View } from "react-native";
 import MaskedView from "@react-native-masked-view/masked-view";
 
@@ -21,7 +21,6 @@ interface KareokeProps extends LrcCommonProps {
 export const RealKaraokeLrcLine = ({
   lrcLine,
   index,
-  activeLineHeight,
   lineRenderer,
   karaokeOnColor,
   karaokeOffColor,
@@ -31,10 +30,12 @@ export const RealKaraokeLrcLine = ({
   align = "center",
   fontSize,
   activeFontSize,
+  activeLineHeight,
 }: KareokeProps) => {
   const [karaokeWidths, setKaraokeWidths] = useState<Array<number | undefined>>(
     []
   );
+  const fontHeight = useRef(0);
 
   return (
     <View
@@ -53,7 +54,7 @@ export const RealKaraokeLrcLine = ({
           key={`${lrcLine.id}.${karaokeIndex}`}
           style={{
             flexDirection: "row",
-            height: activeLineHeight,
+            height: fontHeight.current || activeLineHeight,
             width: karaokeWidths[karaokeIndex] ?? 0,
           }}
           maskElement={lineRenderer({
@@ -92,11 +93,13 @@ export const RealKaraokeLrcLine = ({
           lrcLine: { content: karaokeLine.content },
           index: karaokeIndex,
           active: true,
-          onLayout: (e) =>
+          onLayout: (e) => {
             setKaraokeWidths((v) => {
               v[karaokeIndex] = e?.nativeEvent?.layout?.width;
               return v;
-            }),
+            });
+            fontHeight.current = e?.nativeEvent?.layout?.height;
+          },
           keyPrefix: "karaokeFakeLine",
           color: karaokeOffColor,
           hidden: karaokeWidths[0] !== undefined,
