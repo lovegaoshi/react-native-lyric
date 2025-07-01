@@ -3,4 +3,5 @@ export interface LrcCommonProps {
   align?: "left" | "center" | "right";
   fontSize?: number;
   activeFontSize?: number;
+  lineHeight?: number;
 }

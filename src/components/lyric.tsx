@@ -86,8 +86,8 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     align = "center",
     fontSize = 14,
     activeFontSize = 16,
-    lineHeight = fontSize + 12,
-    activeLineHeight = activeFontSize + 12,
+    lineHeight = fontSize + 14,
+    activeLineHeight = activeFontSize + 14,
     lapsedAsActiveColor,
     ...props
   }: Props,
@@ -222,6 +222,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
       case KaraokeMode.OnlyRealKaraoke:
         return lrcLine.karaokeLines ? (
           <RealKaraokeLrcLine
+            activeLineHeight={activeLineHeight}
             fontSize={fontSize}
             activeFontSize={activeFontSize}
             align={align}
@@ -231,7 +232,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
             lrcLine={lrcLine}
             index={index}
             lineRenderer={lineRenderer}
-            activeLineHeight={activeLineHeight}
+            lineHeight={lineHeight}
             karaokeOffColor={karaokeOffColor}
             karaokeOnColor={karaokeOnColor}
             onViewLayout={(e) =>
@@ -261,6 +262,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
             onViewLayout={(e) =>
               (lrcHeights.current[index] = e.nativeEvent.layout.y)
             }
+            lineHeight={lineHeight}
           />
         ) : (
           <FakeKaraokeLine />

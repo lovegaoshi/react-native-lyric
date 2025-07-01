@@ -25,17 +25,18 @@ export const defaultLineRenderer = ({
   align = "center",
   fontSize = 14,
   activeFontSize = 16,
+  lineHeight,
 }: LineRendererProps) => (
   <Text
     key={`${keyPrefix}.${index}`}
     onLayout={onLayout}
     style={{
-      paddingVertical: 4,
+      lineHeight,
       textAlign: align,
       color,
       fontSize: active ? activeFontSize : fontSize,
       opacity: hidden ? 0 : active ? 1 : 0.8,
-      fontWeight: active ? "500" : "400",
+      fontWeight: "400", //active ? "500" :
       position: hidden ? "absolute" : undefined,
       // width: "100%",
     }}
@@ -71,6 +72,7 @@ const StandardLrcLine = function standardLrcLine({
   fontSize,
   activeFontSize,
   lapsedAsActiveColor,
+  lineHeight,
 }: StandardLrcLineProps) {
   const isActiveColor = lapsedAsActiveColor
     ? currentIndex >= index
@@ -97,6 +99,7 @@ const StandardLrcLine = function standardLrcLine({
           index,
           active: currentIndex === index,
           color: isActiveColor ? karaokeOnColor : karaokeOffColor,
+          lineHeight,
         })}
       </Pressable>
     </View>

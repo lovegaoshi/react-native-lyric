@@ -49,6 +49,7 @@ export const FakeKaraokeLrcLine = ({
   align,
   fontSize,
   activeFontSize,
+  lineHeight,
 }: Props) => {
   const karaokeProgress = calculateKaraokeLrcLineProgress({
     currentIndex,
@@ -74,6 +75,7 @@ export const FakeKaraokeLrcLine = ({
         lrcLine,
         index,
         active: true,
+        lineHeight,
       })}
     >
       {lrcLine.duration ? (
