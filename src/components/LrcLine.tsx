@@ -30,6 +30,7 @@ export const defaultLineRenderer = ({
     key={`${keyPrefix}.${index}`}
     onLayout={onLayout}
     style={{
+      paddingVertical: 4,
       textAlign: align,
       color,
       fontSize: active ? activeFontSize : fontSize,
