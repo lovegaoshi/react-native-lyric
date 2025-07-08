@@ -23,8 +23,9 @@ import {
 import { RealKaraokeLrcLine } from "./KLrcLine";
 import { FakeKaraokeLrcLine } from "./FakeKLrcLine";
 import { execWhenTrue } from "../util/utils";
+import type { LrcCommonProps } from "./LrcProps";
 
-interface Props {
+interface Props extends LrcCommonProps {
   /** lrc string */
   lrc: string;
   /** lrc line render */
@@ -53,7 +54,7 @@ interface Props {
   karaokeOnColor?: string;
   karaokeOffColor?: string;
   karaokeMode?: KaraokeMode;
-  fontScale?: number;
+  lapsedAsActiveColor?: boolean;
   [key: string]: any;
 }
 
@@ -71,8 +72,6 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     lineRenderer = defaultLineRenderer,
     currentTime = 0,
     autoScroll = true,
-    lineHeight = 26,
-    activeLineHeight = lineHeight,
     autoScrollAfterUserScroll = AUTO_SCROLL_AFTER_USER_SCROLL,
     onCurrentLineChange,
     height = 500,
@@ -84,12 +83,20 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     karaokeOnColor = "white",
     karaokeMode = KaraokeMode.NoKaraoke,
     fontScale = 1,
+    align = "center",
+    fontSize = 14,
+    activeFontSize = 16,
+    lineHeight = fontSize + 14,
+    activeLineHeight = activeFontSize + 14,
+    lapsedAsActiveColor,
     ...props
   }: Props,
   ref
 ) {
   lineHeight *= fontScale;
   activeLineHeight *= fontScale;
+  fontSize *= fontScale;
+  activeFontSize *= fontScale;
   const lrcRef = useRef<ScrollView>(null);
   const lrcLineList = useLrc(lrc, showUnformatted);
   const lrcHeights = useRef<number[]>([]);
@@ -144,6 +151,10 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     () =>
       lrcLineList.map((lrcLine, index) => (
         <MemoStandardLine
+          lapsedAsActiveColor={lapsedAsActiveColor}
+          fontSize={fontSize}
+          activeFontSize={activeFontSize}
+          align={align}
           fontScale={fontScale}
           key={`${lrcLine.id}.standard.${index}`}
           lrcLine={lrcLine}
@@ -165,6 +176,10 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   const determineKaraokeMode = (lrcLine: LrcLine, index: number) => {
     const defaultLine = () => (
       <MemoStandardLine
+        lapsedAsActiveColor={lapsedAsActiveColor}
+        fontSize={fontSize}
+        activeFontSize={activeFontSize}
+        align={align}
         fontScale={fontScale}
         key={`${lrcLine.id}.standard.${index}`}
         lrcLine={lrcLine}
@@ -184,6 +199,9 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
 
     const FakeKaraokeLine = () => (
       <FakeKaraokeLrcLine
+        fontSize={fontSize}
+        activeFontSize={activeFontSize}
+        align={align}
         fontScale={fontScale}
         currentIndex={currentIndex}
         currentTime={currentTime}
@@ -204,13 +222,17 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
       case KaraokeMode.OnlyRealKaraoke:
         return lrcLine.karaokeLines ? (
           <RealKaraokeLrcLine
+            activeLineHeight={activeLineHeight}
+            fontSize={fontSize}
+            activeFontSize={activeFontSize}
+            align={align}
             fontScale={fontScale}
             key={`${lrcLine.id}.real.${index}`}
             currentTime={currentTime}
             lrcLine={lrcLine}
             index={index}
             lineRenderer={lineRenderer}
-            activeLineHeight={activeLineHeight}
+            lineHeight={lineHeight}
             karaokeOffColor={karaokeOffColor}
             karaokeOnColor={karaokeOnColor}
             onViewLayout={(e) =>
@@ -225,6 +247,9 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
       case KaraokeMode.Karaoke:
         return lrcLine.karaokeLines ? (
           <RealKaraokeLrcLine
+            fontSize={fontSize}
+            activeFontSize={activeFontSize}
+            align={align}
             fontScale={fontScale}
             key={`${lrcLine.id}.real.${index}`}
             currentTime={currentTime}
@@ -237,6 +262,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
             onViewLayout={(e) =>
               (lrcHeights.current[index] = e.nativeEvent.layout.y)
             }
+            lineHeight={lineHeight}
           />
         ) : (
           <FakeKaraokeLine />

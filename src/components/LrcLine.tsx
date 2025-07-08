@@ -2,8 +2,9 @@ import React from "react";
 import { Text, Pressable, View } from "react-native";
 
 import type { LrcLine } from "../constant";
+import type { LrcCommonProps } from "./LrcProps";
 
-export interface LineRendererProps {
+export interface LineRendererProps extends LrcCommonProps {
   lrcLine: { content: string };
   active: boolean;
   color?: string;
@@ -11,7 +12,6 @@ export interface LineRendererProps {
   onLayout?: (e: any) => void;
   keyPrefix?: string;
   hidden?: boolean;
-  fontScale?: number;
 }
 
 export const defaultLineRenderer = ({
@@ -22,18 +22,21 @@ export const defaultLineRenderer = ({
   index,
   keyPrefix = "lyric",
   hidden = false,
-  fontScale = 1,
+  align = "center",
+  fontSize = 14,
+  activeFontSize = 16,
+  lineHeight,
 }: LineRendererProps) => (
   <Text
     key={`${keyPrefix}.${index}`}
     onLayout={onLayout}
     style={{
-      paddingVertical: 4,
-      textAlign: "center",
+      lineHeight,
+      textAlign: align,
       color,
-      fontSize: active ? 16 * fontScale : 14 * fontScale,
+      fontSize: active ? activeFontSize : fontSize,
       opacity: hidden ? 0 : active ? 1 : 0.8,
-      fontWeight: active ? "500" : "400",
+      fontWeight: "400", //active ? "500" :
       position: hidden ? "absolute" : undefined,
       // width: "100%",
     }}
@@ -42,7 +45,7 @@ export const defaultLineRenderer = ({
   </Text>
 );
 
-interface StandardLrcLineProps {
+interface StandardLrcLineProps extends LrcCommonProps {
   lrcLine: LrcLine;
   index: number;
   currentIndex: number;
@@ -53,7 +56,7 @@ interface StandardLrcLineProps {
   karaokeOffColor: string;
   onViewLayout?: (e: any) => void;
   onPress?: (l: LrcLine) => void;
-  fontScale?: number;
+  lapsedAsActiveColor?: boolean;
 }
 const StandardLrcLine = function standardLrcLine({
   lrcLine,
@@ -65,12 +68,20 @@ const StandardLrcLine = function standardLrcLine({
   lineRenderer = defaultLineRenderer,
   onPress,
   fontScale,
+  align = "center",
+  fontSize,
+  activeFontSize,
+  lapsedAsActiveColor,
+  lineHeight,
 }: StandardLrcLineProps) {
+  const isActiveColor = lapsedAsActiveColor
+    ? currentIndex >= index
+    : currentIndex === index;
   return (
     <View
       style={{
         flexDirection: "row",
-        justifyContent: "center",
+        justifyContent: align === "center" ? "center" : undefined,
       }}
       onLayout={onViewLayout}
     >
@@ -80,11 +91,15 @@ const StandardLrcLine = function standardLrcLine({
         onStartShouldSetResponder={() => true}
       >
         {lineRenderer({
+          fontSize,
+          activeFontSize,
+          align,
           fontScale,
           lrcLine,
           index,
           active: currentIndex === index,
-          color: currentIndex === index ? karaokeOnColor : karaokeOffColor,
+          color: isActiveColor ? karaokeOnColor : karaokeOffColor,
+          lineHeight,
         })}
       </Pressable>
     </View>
@@ -98,6 +113,11 @@ const propsEqual = (
   const propKeys = Object.keys(oldProps) as unknown as Array<
     keyof StandardLrcLineProps
   >;
+  // if lapsedAsActiveColor is on, color should be updated on every currentIndex update
+  const lapsedColorUpdate =
+    newProps.lapsedAsActiveColor &&
+    oldProps.currentIndex !== newProps.currentIndex;
+  if (lapsedColorUpdate) return false;
   // if all keys other than currentIndex are the same,
   // as well as index === currentIndex does not change,
   // they are the same
