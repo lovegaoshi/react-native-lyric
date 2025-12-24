@@ -92,6 +92,7 @@ const StandardLrcLine = function standardLrcLine({
         style={{
           flexDirection: "row",
           justifyContent: align === "center" ? "center" : undefined,
+          flexWrap: "wrap",
         }}
       >
         {lrcLine.karaokeLines
