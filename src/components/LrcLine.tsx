@@ -89,18 +89,36 @@ const StandardLrcLine = function standardLrcLine({
         key={lrcLine.id}
         onPress={() => onPress?.(lrcLine)}
         onStartShouldSetResponder={() => true}
+        style={{
+          flexDirection: "row",
+          justifyContent: align === "center" ? "center" : undefined,
+        }}
       >
-        {lineRenderer({
-          fontSize,
-          activeFontSize,
-          align,
-          fontScale,
-          lrcLine,
-          index,
-          active: currentIndex === index,
-          color: isActiveColor ? karaokeOnColor : karaokeOffColor,
-          lineHeight,
-        })}
+        {lrcLine.karaokeLines
+          ? lrcLine.karaokeLines.map((karaokeLine, karaokeIndex) =>
+              lineRenderer({
+                fontSize,
+                activeFontSize,
+                align,
+                fontScale,
+                lrcLine: { content: karaokeLine.content },
+                index: karaokeIndex,
+                active: currentIndex === index,
+                color: isActiveColor ? karaokeOnColor : karaokeOffColor,
+                lineHeight,
+              })
+            )
+          : lineRenderer({
+              fontSize,
+              activeFontSize,
+              align,
+              fontScale,
+              lrcLine,
+              index,
+              active: currentIndex === index,
+              color: isActiveColor ? karaokeOnColor : karaokeOffColor,
+              lineHeight,
+            })}
       </Pressable>
     </View>
   );
