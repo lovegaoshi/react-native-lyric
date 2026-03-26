@@ -1,0 +1,66 @@
+import type { LrcLine } from "../../constant";
+import getRandomString from "../getRandomString";
+import parse from "./parseHelper";
+
+// <p t="269040" d="3599" w="1"><s ac="0">a</s><s t="240" ac="0"> defined</s><s t="960" ac="0"> benefit</s><s t="1360" ac="0"> pension</s><s t="1760" ac="0"> plan.</s><s t="2000" ac="0"> You</s><s t="2080" ac="0"> know</s></p>
+// <p t="(\d+)" d="\d+" w="\d+">(.+)</p>
+// then for each <s t="(\d+)" ac="\d+">(.+)</s> t needs to add to the previous t
+
+const PrefixTimestampRegex =
+  /<p t="(\d+)" d="\d+" w="\d+">(.+)<\/p>\n<p t="(\d+)"/g;
+const KaraokeLineRegex = /<s[^<]+>[^<]+<\/s>/g;
+const karaokeParseExtractRegex = /<s (t="(\d+)")?[^>]+>([^<]+)<\/s>/;
+
+export default (lrc: string, showUnformatted = true): LrcLine[] => {
+  const lrcLineList: LrcLine[] = [];
+  const unformattedLrc: string[] = [];
+
+  const lineList = Array.from(lrc.matchAll(PrefixTimestampRegex));
+
+  /**
+   * now each line is 
+    <p t="14160" d="4879" w="1"><s ac="0">be</s><s t="80" ac="0"> with</s><s t="160" ac="0"> you,</s><s t="399" ac="0"> Joe.</s><s t="1280" ac="0"> Great</s><s t="1519" ac="0"> to</s><s t="1679" ac="0"> be</s><s t="2160" ac="0"> You&#39;ve</s><s t="2400" ac="0"> got</s></p>
+    <p t="16710" d="2329" w="1" a="1">
+   */
+  lineList.forEach((line) => {
+    const millisecond = Number(line[1]);
+    const duration = Number(line[3]) - millisecond;
+    const karaokeTimestamps = Array.from(line[2].matchAll(KaraokeLineRegex));
+
+    /**
+     * here each karaoke line is like <s t="80" ac="0"> with</s>;
+     * the list is reversed, the first element's duration is duration - t;
+     * every other element's duration is the t of the previous element - t of current element;
+     * the last element doesnt have t, so t = millisecond here
+     */
+    const karaokeLines = karaokeTimestamps
+      .toReversed()
+      .map((karaoke, index) => {
+        const [_, __, t, content] = karaoke[0].match(
+          karaokeParseExtractRegex
+        ) as string[];
+        return {
+          start: t ? Number(t) : millisecond,
+          duration:
+            index === 0
+              ? duration - (t ? Number(t) : millisecond)
+              : (
+                  karaokeTimestamps[index - 1][0].match(
+                    karaokeParseExtractRegex
+                  ) as string[]
+                )[2] - (t ? Number(t) : millisecond),
+          content,
+        };
+      })
+      .toReversed();
+
+    lrcLineList.push({
+      id: getRandomString(),
+      millisecond,
+      duration,
+      content: karaokeLines.reduce((acc, curr) => acc + curr.content, ""),
+      karaokeLines,
+    });
+    return parse(lrcLineList, unformattedLrc, showUnformatted);
+  });
+};

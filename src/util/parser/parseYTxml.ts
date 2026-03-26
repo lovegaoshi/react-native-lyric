@@ -17,7 +17,12 @@ const decodeXml = (text: string) =>
     .replace(/&amp;/g, "&");
 
 const parseAttributes = (attributeString: string) =>
-  Object.fromEntries(Array.from(attributeString.matchAll(AttributeRegex), ([, key, value]) => [key, value]));
+  Object.fromEntries(
+    Array.from(attributeString.matchAll(AttributeRegex), ([, key, value]) => [
+      key,
+      value,
+    ]),
+  );
 
 export default (lrc: string, showUnformatted = true): LrcLine[] => {
   const lrcLineList: LrcLine[] = [];
@@ -29,10 +34,14 @@ export default (lrc: string, showUnformatted = true): LrcLine[] => {
     return parse(lrcLineList, unformattedLrc, showUnformatted);
   }
 
-  for (const [, attributeString, innerContent] of paragraphs) {
+  for (const [paragraphIndex, [, attributeString, innerContent]] of paragraphs.entries()) {
     const attributes = parseAttributes(attributeString);
     const millisecond = Number(attributes.t);
     const duration = attributes.d ? Number(attributes.d) : undefined;
+    const nextParagraph = paragraphs[paragraphIndex + 1];
+    const nextParagraphMillisecond = nextParagraph
+      ? Number(parseAttributes(nextParagraph[1]).t)
+      : undefined;
 
     if (Number.isNaN(millisecond)) {
       continue;
@@ -50,11 +59,16 @@ export default (lrc: string, showUnformatted = true): LrcLine[] => {
         const text = decodeXml(segment[2].replace(TagRegex, ""));
 
         return {
-          start,
+          start: start + millisecond,
           duration:
             nextStart !== undefined
               ? Math.max(nextStart - start, 0)
-              : Math.max((duration ?? start) - start, 0),
+              : Math.max(
+                  (nextParagraphMillisecond ?? millisecond + (duration ?? start)) -
+                    millisecond -
+                    start,
+                  0,
+                ),
           content: text,
         };
       });
