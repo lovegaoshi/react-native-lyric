@@ -3,6 +3,7 @@ import parseLrc from "./parseLrc";
 import parseKrc from "./parseKrc";
 import parseQrc from "./parseQrc";
 import parseYrc from "./parseYrc";
+import parseYTxml from "./parseYTxml";
 
 export default (lrc: string, showUnformatted = true, source?: Source) => {
   switch (source) {
@@ -14,9 +15,11 @@ export default (lrc: string, showUnformatted = true, source?: Source) => {
       return parseQrc(lrc, showUnformatted);
     case Source.Yrc:
       return parseYrc(lrc, showUnformatted);
+    case Source.YTxml:
+      return parseYTxml(lrc, showUnformatted);
     default:
       const parsedLrc = [];
-      for (const parser of [parseKrc, parseQrc, parseYrc]) {
+      for (const parser of [parseKrc, parseQrc, parseYrc, parseYTxml]) {
         const result = parser(lrc, false);
         if (result.length > 0 && (result[0].karaokeLines?.length ?? 0) > 0)
           return result;
