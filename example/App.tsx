@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Text, View, StyleSheet } from "react-native";
 import Constants from "expo-constants";
-import lrc from "../tests/qrc";
+import lrc from "../tests/ytxml";
 
 // or any pure javascript modules available in npm
 import { Lrc, KaraokeMode } from "react-native-lyric";

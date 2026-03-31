@@ -6,6 +6,7 @@ export enum Source {
   Krc = "Krc",
   Qrc = "Qrc",
   Yrc = "Yrc",
+  YTxml = "YTxml",
 }
 
 export default (
