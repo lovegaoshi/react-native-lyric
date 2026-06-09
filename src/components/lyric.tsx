@@ -238,6 +238,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
             onViewLayout={(e) =>
               (lrcHeights.current[index] = e.nativeEvent.layout.y)
             }
+            onPress={onLinePress}
           />
         ) : (
           defaultLine()
