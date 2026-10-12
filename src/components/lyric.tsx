@@ -29,7 +29,7 @@ interface Props extends LrcCommonProps {
   /** lrc string */
   lrc: string;
   /** lrc line render */
-  lineRenderer: (props: LineRendererProps) => JSX.Element;
+  lineRenderer: (props: LineRendererProps) => React.JSX.Element;
   /** audio currentTime, millisecond */
   currentTime?: number;
   /** whether auto scroll  */

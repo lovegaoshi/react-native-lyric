@@ -12,6 +12,7 @@ function useTimer(speed = 1) {
     if (!paused) {
       let last = Date.now();
       const timer = window.setInterval(() => {
+        console.log("updating!");
         const now = Date.now();
         setCurrentMillisecond((cm) => cm + (now - last) * speed);
         last = now;

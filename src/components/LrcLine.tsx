@@ -1,5 +1,9 @@
 import React from "react";
-import { Text, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  withTiming,
+} from 'react-native-reanimated';
 
 import type { LrcLine } from "../constant";
 import type { LrcCommonProps } from "./LrcProps";
@@ -26,30 +30,37 @@ export const defaultLineRenderer = ({
   fontSize = 14,
   activeFontSize = 16,
   lineHeight,
-}: LineRendererProps) => (
-  <Text
-    key={`${keyPrefix}.${index}`}
-    onLayout={onLayout}
-    style={{
-      lineHeight,
-      textAlign: align,
-      color,
-      fontSize: active ? activeFontSize : fontSize,
-      opacity: hidden ? 0 : active ? 1 : 0.8,
-      fontWeight: "400", //active ? "500" :
-      position: hidden ? "absolute" : undefined,
-      // width: "100%",
-    }}
-  >
-    {content}
-  </Text>
-);
+}: LineRendererProps) => {
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      fontSize: active ? withTiming(activeFontSize, { duration: 200 }) : withTiming(fontSize, { duration: 200 }),
+    };
+  });
+
+  return (
+    <Animated.Text
+      key={`${keyPrefix}.${index}`}
+      onLayout={onLayout}
+      style={[{
+        lineHeight,
+        textAlign: align,
+        color,
+        opacity: hidden ? 0 : active ? 1 : 0.8,
+        fontWeight: "400", //active ? "500" :
+        position: hidden ? "absolute" : undefined,
+        // width: "100%",
+      }, animatedStyle]}
+    >
+      {content}
+    </Animated.Text>
+  )
+};
 
 interface StandardLrcLineProps extends LrcCommonProps {
   lrcLine: LrcLine;
   index: number;
   currentIndex: number;
-  lineRenderer?: (props: LineRendererProps) => JSX.Element;
+  lineRenderer?: (props: LineRendererProps) => React.JSX.Element;
   activeLineHeight: number;
   lineHeight: number;
   karaokeOnColor: string;

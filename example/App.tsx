@@ -20,7 +20,7 @@ export default function App() {
         currentTime={currentMillisecond}
         autoScroll
         autoScrollAfterUserScroll={500}
-        karaokeMode={KaraokeMode.OnlyRealKaraoke}
+        karaokeMode={KaraokeMode.NoKaraoke}
         onPress={console.log}
         onLinePress={console.log}
       />

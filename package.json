@@ -36,12 +36,16 @@
     "react": "18.3.1",
     "react-native": "0.76.2",
     "release-it": "^14.2.2",
-    "typescript": "5.8.3"
+    "typescript": "5.8.3",
+    "react-native-reanimated": "4.5.3",
+    "react-native-worklets": "0.11.4"
   },
   "peerDependencies": {
     "@react-native-masked-view/masked-view": "^0.3.1",
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "react-native-reanimated": "*",
+    "react-native-worklets": "*"
   },
   "dependencies": {},
   "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
