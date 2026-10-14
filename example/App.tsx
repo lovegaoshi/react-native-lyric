@@ -23,6 +23,7 @@ export default function App() {
         karaokeMode={KaraokeMode.NoKaraoke}
         onPress={console.log}
         onLinePress={console.log}
+        activeFontSize={50}
       />
     </View>
   );

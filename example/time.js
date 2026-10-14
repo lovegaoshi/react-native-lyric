@@ -11,13 +11,13 @@ function useTimer(speed = 1) {
   useEffect(() => {
     if (!paused) {
       let last = Date.now();
-      const timer = window.setInterval(() => {
+      const timer = setInterval(() => {
         console.log("updating!");
         const now = Date.now();
         setCurrentMillisecond((cm) => cm + (now - last) * speed);
         last = now;
       }, 97);
-      return () => window.clearInterval(timer);
+      return () => clearInterval(timer);
     }
   }, [paused, speed]);
 
