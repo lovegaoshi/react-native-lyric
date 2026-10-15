@@ -36,6 +36,17 @@ export const RealKaraokeLrcLine = ({
     []
   );
 
+  const lrcProps = {
+            lineHeight,
+            fontSize,
+            activeFontSize,
+            align,
+            fontScale,
+            index,
+            active: true,
+            color: "white",
+          }
+  
   return (
     <View
       onLayout={onViewLayout}
@@ -57,15 +68,8 @@ export const RealKaraokeLrcLine = ({
             width: karaokeWidths[karaokeIndex] ?? 0,
           }}
           maskElement={lineRenderer({
-            lineHeight,
-            fontSize,
-            activeFontSize,
-            align,
-            fontScale,
+            ...lrcProps,
             lrcLine: { content: karaokeLine.content },
-            index,
-            active: true,
-            color: "white",
           })}
         >
           <View
@@ -86,11 +90,7 @@ export const RealKaraokeLrcLine = ({
       ))}
       {lrcLine.karaokeLines?.map((karaokeLine, karaokeIndex) =>
         lineRenderer({
-          lineHeight,
-          fontSize,
-          activeFontSize,
-          align,
-          fontScale,
+          ...lrcProps,
           lrcLine: { content: karaokeLine.content },
           index: karaokeIndex,
           active: true,

@@ -30,9 +30,10 @@ export const DefaultLineRenderer = ({
   align = "center",
   fontSize = 14,
   activeFontSize = 16,
+  currentFontSize = fontSize,
   lineHeight,
 }: LineRendererProps) => {
-  const animatedFontSize = useSharedValue(fontSize);
+  const animatedFontSize = useSharedValue(currentFontSize);
   React.useEffect(() => {
     animatedFontSize.value = withTiming(active ? activeFontSize : fontSize, { duration: 200 });
   }, [active]);
@@ -92,6 +93,20 @@ const StandardLrcLine = function standardLrcLine({
   const isActiveColor = lapsedAsActiveColor
     ? currentIndex >= index
     : currentIndex === index;
+  const lrcProps = {
+              fontSize,
+              activeFontSize,
+              currentFontSize: currentIndex === index + 1 ? activeFontSize : fontSize,
+              align,
+              fontScale,
+              lrcLine,
+              index,
+              active: currentIndex === index,
+              color: isActiveColor ? karaokeOnColor : karaokeOffColor,
+              lineHeight,
+            }
+
+
   return (
     <View
       style={{
@@ -114,28 +129,12 @@ const StandardLrcLine = function standardLrcLine({
         {lrcLine.karaokeLines
           ? lrcLine.karaokeLines.map((karaokeLine, karaokeIndex) =>
               lineRenderer({
-                fontSize,
-                activeFontSize,
-                align,
-                fontScale,
+                ...lrcProps,
                 lrcLine: { content: karaokeLine.content },
                 index: karaokeIndex,
-                active: currentIndex === index,
-                color: isActiveColor ? karaokeOnColor : karaokeOffColor,
-                lineHeight,
               })
             )
-          : lineRenderer({
-              fontSize,
-              activeFontSize,
-              align,
-              fontScale,
-              lrcLine,
-              index,
-              active: currentIndex === index,
-              color: isActiveColor ? karaokeOnColor : karaokeOffColor,
-              lineHeight,
-            })}
+          : lineRenderer(lrcProps)}
       </Pressable>
     </View>
   );
