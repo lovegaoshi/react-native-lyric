@@ -19,7 +19,7 @@ export default (lrc: string, showUnformatted = true): LrcLine[] => {
     const content = line.replace(LRC_TIMESTAMP_WITH_BRACKET, "");
     for (const timeString of timeStringList) {
       const [minute, second, millisecond = "0"] = timeString.match(
-        LRC_TIMESTAMP
+        LRC_TIMESTAMP,
       ) as string[];
       lrcLineList.push({
         id: getRandomString(),

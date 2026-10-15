@@ -21,8 +21,11 @@ export enum KaraokeMode {
   Karaoke = "karaoke",
 }
 
-export const calcKaraokePercentage = (currentTime: number, line: KaraokeLine) => {
+export const calcKaraokePercentage = (
+  currentTime: number,
+  line: KaraokeLine,
+) => {
   if (currentTime > line.start + line.duration) return 100;
   if (currentTime < line.start) return 0;
-  return (currentTime - line.start) / line.duration * 100;
-}
+  return ((currentTime - line.start) / line.duration) * 100;
+};

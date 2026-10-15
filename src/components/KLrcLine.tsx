@@ -33,20 +33,20 @@ export const RealKaraokeLrcLine = ({
   lineHeight,
 }: KareokeProps) => {
   const [karaokeWidths, setKaraokeWidths] = useState<Array<number | undefined>>(
-    []
+    [],
   );
 
   const lrcProps = {
-            lineHeight,
-            fontSize,
-            activeFontSize,
-            align,
-            fontScale,
-            index,
-            active: true,
-            color: "white",
-          }
-  
+    lineHeight,
+    fontSize,
+    activeFontSize,
+    align,
+    fontScale,
+    index,
+    active: true,
+    color: "white",
+  };
+
   return (
     <View
       onLayout={onViewLayout}
@@ -103,7 +103,7 @@ export const RealKaraokeLrcLine = ({
           keyPrefix: "karaokeFakeLine",
           color: karaokeOffColor,
           hidden: karaokeWidths[0] !== undefined,
-        })
+        }),
       )}
     </View>
   );

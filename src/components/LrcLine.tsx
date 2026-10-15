@@ -4,7 +4,7 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
-} from 'react-native-reanimated';
+} from "react-native-reanimated";
 
 import type { LrcLine } from "../constant";
 import type { LrcCommonProps } from "./LrcProps";
@@ -35,30 +35,35 @@ export const DefaultLineRenderer = ({
 }: LineRendererProps) => {
   const animatedFontSize = useSharedValue(currentFontSize);
   React.useEffect(() => {
-    animatedFontSize.value = withTiming(active ? activeFontSize : fontSize, { duration: 200 });
+    animatedFontSize.value = withTiming(active ? activeFontSize : fontSize, {
+      duration: 200,
+    });
   }, [active]);
 
-  const animatedStyle = useAnimatedStyle(() => (
-{      fontSize: animatedFontSize.value
-}));
+  const animatedStyle = useAnimatedStyle(() => ({
+    fontSize: animatedFontSize.value,
+  }));
 
   return (
     <Animated.Text
       key={`${keyPrefix}.${index}`}
       onLayout={onLayout}
-      style={[{
-        lineHeight,
-        textAlign: align,
-        color,
-        opacity: hidden ? 0 : active ? 1 : 0.8,
-        fontWeight: "400", //active ? "500" :
-        position: hidden ? "absolute" : undefined,
-        // width: "100%",
-      }, animatedStyle]}
+      style={[
+        {
+          lineHeight,
+          textAlign: align,
+          color,
+          opacity: hidden ? 0 : active ? 1 : 0.8,
+          fontWeight: "400", //active ? "500" :
+          position: hidden ? "absolute" : undefined,
+          // width: "100%",
+        },
+        animatedStyle,
+      ]}
     >
       {content}
     </Animated.Text>
-  )
+  );
 };
 
 interface StandardLrcLineProps extends LrcCommonProps {
@@ -94,18 +99,17 @@ const StandardLrcLine = function standardLrcLine({
     ? currentIndex >= index
     : currentIndex === index;
   const lrcProps = {
-              fontSize,
-              activeFontSize,
-              currentFontSize: currentIndex === index + 1 ? activeFontSize : fontSize,
-              align,
-              fontScale,
-              lrcLine,
-              index,
-              active: currentIndex === index,
-              color: isActiveColor ? karaokeOnColor : karaokeOffColor,
-              lineHeight,
-            }
-
+    fontSize,
+    activeFontSize,
+    currentFontSize: currentIndex === index + 1 ? activeFontSize : fontSize,
+    align,
+    fontScale,
+    lrcLine,
+    index,
+    active: currentIndex === index,
+    color: isActiveColor ? karaokeOnColor : karaokeOffColor,
+    lineHeight,
+  };
 
   return (
     <View
@@ -132,7 +136,7 @@ const StandardLrcLine = function standardLrcLine({
                 ...lrcProps,
                 lrcLine: { content: karaokeLine.content },
                 index: karaokeIndex,
-              })
+              }),
             )
           : lineRenderer(lrcProps)}
       </Pressable>
@@ -142,7 +146,7 @@ const StandardLrcLine = function standardLrcLine({
 
 const propsEqual = (
   oldProps: StandardLrcLineProps,
-  newProps: StandardLrcLineProps
+  newProps: StandardLrcLineProps,
 ) => {
   const propKeys = Object.keys(oldProps) as unknown as Array<
     keyof StandardLrcLineProps

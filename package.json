@@ -5,7 +5,8 @@
   "main": "src/index.ts",
   "scripts": {
     "lint": "eslint .",
-    "test": "jest"
+    "test": "jest",
+    "prettify": "prettier --write ./src"
   },
   "keywords": [
     "react-native",

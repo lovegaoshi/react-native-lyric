@@ -34,7 +34,10 @@ export default (lrc: string, showUnformatted = true): LrcLine[] => {
     return parse(lrcLineList, unformattedLrc, showUnformatted);
   }
 
-  for (const [paragraphIndex, [, attributeString, innerContent]] of paragraphs.entries()) {
+  for (const [
+    paragraphIndex,
+    [, attributeString, innerContent],
+  ] of paragraphs.entries()) {
     const attributes = parseAttributes(attributeString);
     const millisecond = Number(attributes.t);
     const duration = attributes.d ? Number(attributes.d) : undefined;
@@ -64,7 +67,8 @@ export default (lrc: string, showUnformatted = true): LrcLine[] => {
             nextStart !== undefined
               ? Math.max(nextStart - start, 0)
               : Math.max(
-                  (nextParagraphMillisecond ?? millisecond + (duration ?? start)) -
+                  (nextParagraphMillisecond ??
+                    millisecond + (duration ?? start)) -
                     millisecond -
                     start,
                   0,

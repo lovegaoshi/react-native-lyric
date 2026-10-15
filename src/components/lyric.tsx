@@ -91,7 +91,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     lapsedAsActiveColor,
     ...props
   }: Props,
-  ref
+  ref,
 ) {
   lineHeight *= fontScale;
   activeLineHeight *= fontScale;
@@ -170,7 +170,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
           }
         />
       )),
-    [activeLineHeight, currentIndex, lineHeight, lineRenderer, lrcLineList]
+    [activeLineHeight, currentIndex, lineHeight, lineRenderer, lrcLineList],
   );
 
   const determineKaraokeMode = (lrcLine: LrcLine, index: number) => {
