@@ -4,4 +4,5 @@ export interface LrcCommonProps {
   fontSize?: number;
   activeFontSize?: number;
   lineHeight?: number;
+  currentFontSize?: number;
 }

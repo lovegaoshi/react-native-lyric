@@ -12,7 +12,7 @@ export enum Source {
 export default (
   lrcLineList: LrcLine[],
   unformattedLrc: string[],
-  showUnformatted = true
+  showUnformatted = true,
 ): LrcLine[] => {
   const sortedLrcs = lrcLineList.sort((a, b) => a.millisecond - b.millisecond);
   return showUnformatted && sortedLrcs.length === 0

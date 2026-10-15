@@ -16,7 +16,7 @@ import {
 import useLrc from "../util/useLrc";
 import useCurrentIndex from "./useCurrentIndex";
 import {
-  defaultLineRenderer,
+  DefaultLineRenderer,
   LineRendererProps,
   MemoStandardLine,
 } from "./LrcLine";
@@ -29,7 +29,7 @@ interface Props extends LrcCommonProps {
   /** lrc string */
   lrc: string;
   /** lrc line render */
-  lineRenderer: (props: LineRendererProps) => JSX.Element;
+  lineRenderer: (props: LineRendererProps) => React.JSX.Element;
   /** audio currentTime, millisecond */
   currentTime?: number;
   /** whether auto scroll  */
@@ -69,7 +69,7 @@ interface LrcProps {
 const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   {
     lrc,
-    lineRenderer = defaultLineRenderer,
+    lineRenderer = DefaultLineRenderer,
     currentTime = 0,
     autoScroll = true,
     autoScrollAfterUserScroll = AUTO_SCROLL_AFTER_USER_SCROLL,
@@ -91,7 +91,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     lapsedAsActiveColor,
     ...props
   }: Props,
-  ref
+  ref,
 ) {
   lineHeight *= fontScale;
   activeLineHeight *= fontScale;
@@ -170,7 +170,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
           }
         />
       )),
-    [activeLineHeight, currentIndex, lineHeight, lineRenderer, lrcLineList]
+    [activeLineHeight, currentIndex, lineHeight, lineRenderer, lrcLineList],
   );
 
   const determineKaraokeMode = (lrcLine: LrcLine, index: number) => {

@@ -11,7 +11,7 @@ interface KareokeProps extends LrcCommonProps {
   lrcLine: LrcLine;
   index: number;
   activeLineHeight: number;
-  lineRenderer: (props: LineRendererProps) => JSX.Element;
+  lineRenderer: (props: LineRendererProps) => React.JSX.Element;
   karaokeOnColor: string;
   karaokeOffColor: string;
   currentTime: number;
@@ -33,8 +33,19 @@ export const RealKaraokeLrcLine = ({
   lineHeight,
 }: KareokeProps) => {
   const [karaokeWidths, setKaraokeWidths] = useState<Array<number | undefined>>(
-    []
+    [],
   );
+
+  const lrcProps = {
+    lineHeight,
+    fontSize,
+    activeFontSize,
+    align,
+    fontScale,
+    index,
+    active: true,
+    color: "white",
+  };
 
   return (
     <View
@@ -57,15 +68,8 @@ export const RealKaraokeLrcLine = ({
             width: karaokeWidths[karaokeIndex] ?? 0,
           }}
           maskElement={lineRenderer({
-            lineHeight,
-            fontSize,
-            activeFontSize,
-            align,
-            fontScale,
+            ...lrcProps,
             lrcLine: { content: karaokeLine.content },
-            index,
-            active: true,
-            color: "white",
           })}
         >
           <View
@@ -86,11 +90,7 @@ export const RealKaraokeLrcLine = ({
       ))}
       {lrcLine.karaokeLines?.map((karaokeLine, karaokeIndex) =>
         lineRenderer({
-          lineHeight,
-          fontSize,
-          activeFontSize,
-          align,
-          fontScale,
+          ...lrcProps,
           lrcLine: { content: karaokeLine.content },
           index: karaokeIndex,
           active: true,
@@ -103,7 +103,7 @@ export const RealKaraokeLrcLine = ({
           keyPrefix: "karaokeFakeLine",
           color: karaokeOffColor,
           hidden: karaokeWidths[0] !== undefined,
-        })
+        }),
       )}
     </View>
   );

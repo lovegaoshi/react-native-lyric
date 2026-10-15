@@ -19,10 +19,10 @@ export default (lrc: string, showUnformatted = true): LrcLine[] => {
     }
     const [millisecond, duration] = JSON.parse(parsedLineTimestamp[0]);
     const truncatedLine = line.slice(
-      parsedLineTimestamp.index! + parsedLineTimestamp[0].length
+      parsedLineTimestamp.index! + parsedLineTimestamp[0].length,
     );
     const karaokeTimestamps = Array.from(
-      truncatedLine.matchAll(KaraokeTimestampRegex)
+      truncatedLine.matchAll(KaraokeTimestampRegex),
     );
     const karaokeLines = karaokeTimestamps.map((karaoke, index) => {
       const [_, karaokeStartTime, karaokeDuration] = karaoke;
@@ -32,7 +32,7 @@ export default (lrc: string, showUnformatted = true): LrcLine[] => {
           (previousKaraokeTimestamp?.index
             ? previousKaraokeTimestamp[0].length
             : 0),
-        karaokeTimestamps[index].index
+        karaokeTimestamps[index].index,
       );
       return {
         start: Number(karaokeStartTime),

@@ -5,18 +5,18 @@ function useTimer(speed = 1) {
   const play = useCallback(() => setPaused(false), []);
   const pause = useCallback(() => setPaused(true), []);
 
-  const [currentMillisecond, setCurrentMillisecond] = useState(0);
+  const [currentMillisecond, setCurrentMillisecond] = useState(20000);
   const reset = useCallback(() => setCurrentMillisecond(0), []);
 
   useEffect(() => {
     if (!paused) {
       let last = Date.now();
-      const timer = window.setInterval(() => {
+      const timer = setInterval(() => {
         const now = Date.now();
         setCurrentMillisecond((cm) => cm + (now - last) * speed);
         last = now;
       }, 97);
-      return () => window.clearInterval(timer);
+      return () => clearInterval(timer);
     }
   }, [paused, speed]);
 

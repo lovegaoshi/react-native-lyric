@@ -23,7 +23,7 @@ export default (lrc: string, showUnformatted = true): LrcLine[] => {
       const [_, karaokeStartTime, karaokeDuration] = karaoke;
       const text = line.substring(
         karaoke.index! + karaoke[0].length,
-        karaokeTimestamps[index + 1]?.index
+        karaokeTimestamps[index + 1]?.index,
       );
       return {
         start: Number(karaokeStartTime),
