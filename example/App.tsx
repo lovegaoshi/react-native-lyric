@@ -1,9 +1,8 @@
 // import "./wdyr"; // <--- first import
 
-import * as React from "react";
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, Button } from "react-native";
 import Constants from "expo-constants";
-import lrc from "../tests/ytxml";
+import lrc from "../tests/krc";
 
 // or any pure javascript modules available in npm
 import { Lrc, KaraokeMode } from "react-native-lyric";
@@ -15,15 +14,20 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text style={styles.paragraph}>current time: {currentMillisecond}</Text>
+      <View style={{ flexDirection: "row", justifyContent: "center", paddingBottom: 20 }}>
+        <Button title="reset" onPress={reset} />
+        <Button title="play" onPress={play} />
+        <Button title="pause" onPress={pause} />
+      </View>
       <Lrc
         lrc={lrc}
         currentTime={currentMillisecond}
         autoScroll
         autoScrollAfterUserScroll={500}
-        karaokeMode={KaraokeMode.NoKaraoke}
+        karaokeMode={KaraokeMode.OnlyRealKaraoke}
         onPress={console.log}
         onLinePress={console.log}
-        activeFontSize={50}
+        activeFontSize={18}
       />
     </View>
   );

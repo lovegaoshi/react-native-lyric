@@ -11,7 +11,7 @@ interface KareokeProps extends LrcCommonProps {
   lrcLine: LrcLine;
   index: number;
   activeLineHeight: number;
-  lineRenderer: (props: LineRendererProps) => JSX.Element;
+  lineRenderer: (props: LineRendererProps) => React.JSX.Element;
   karaokeOnColor: string;
   karaokeOffColor: string;
   currentTime: number;

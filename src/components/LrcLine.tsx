@@ -2,6 +2,7 @@ import React from "react";
 import { Pressable, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
+  useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
 
@@ -18,7 +19,7 @@ export interface LineRendererProps extends LrcCommonProps {
   hidden?: boolean;
 }
 
-export const defaultLineRenderer = ({
+export const DefaultLineRenderer = ({
   lrcLine: { content },
   active,
   color,
@@ -31,11 +32,14 @@ export const defaultLineRenderer = ({
   activeFontSize = 16,
   lineHeight,
 }: LineRendererProps) => {
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      fontSize: active ? withTiming(activeFontSize, { duration: 200 }) : withTiming(fontSize, { duration: 200 }),
-    };
-  });
+  const animatedFontSize = useSharedValue(fontSize);
+  React.useEffect(() => {
+    animatedFontSize.value = withTiming(active ? activeFontSize : fontSize, { duration: 200 });
+  }, [active]);
+
+  const animatedStyle = useAnimatedStyle(() => (
+{      fontSize: animatedFontSize.value
+}));
 
   return (
     <Animated.Text
@@ -76,7 +80,7 @@ const StandardLrcLine = function standardLrcLine({
   karaokeOnColor,
   karaokeOffColor,
   onViewLayout,
-  lineRenderer = defaultLineRenderer,
+  lineRenderer = DefaultLineRenderer,
   onPress,
   fontScale,
   align = "center",

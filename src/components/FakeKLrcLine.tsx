@@ -15,7 +15,7 @@ interface LrcPositionProps {
 }
 
 interface Props extends LrcPositionProps, LrcCommonProps {
-  lineRenderer: (props: LineRendererProps) => JSX.Element;
+  lineRenderer: (props: LineRendererProps) => React.JSX.Element;
   lrcHeights: React.MutableRefObject<number[]>;
   activeLineHeight: number;
   karaokeOnColor: string;

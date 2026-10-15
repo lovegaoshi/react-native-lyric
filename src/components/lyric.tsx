@@ -16,7 +16,7 @@ import {
 import useLrc from "../util/useLrc";
 import useCurrentIndex from "./useCurrentIndex";
 import {
-  defaultLineRenderer,
+  DefaultLineRenderer,
   LineRendererProps,
   MemoStandardLine,
 } from "./LrcLine";
@@ -69,7 +69,7 @@ interface LrcProps {
 const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   {
     lrc,
-    lineRenderer = defaultLineRenderer,
+    lineRenderer = DefaultLineRenderer,
     currentTime = 0,
     autoScroll = true,
     autoScrollAfterUserScroll = AUTO_SCROLL_AFTER_USER_SCROLL,
