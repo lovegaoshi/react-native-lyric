@@ -6,6 +6,7 @@ import {
   View,
   ViewStyle,
   Pressable,
+  ScrollViewInstance,
 } from "react-native";
 
 import {
@@ -97,7 +98,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   activeLineHeight *= fontScale;
   fontSize *= fontScale;
   activeFontSize *= fontScale;
-  const lrcRef = useRef<ScrollView>(null);
+  const lrcRef = useRef<ScrollViewInstance>(null);
   const lrcLineList = useLrc(lrc, showUnformatted);
   const lrcHeights = useRef<number[]>([]);
   const scrolled = useRef(false);

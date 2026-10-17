@@ -1,8 +1,9 @@
 // import "./wdyr"; // <--- first import
 
+import React from "react";
 import { Text, View, StyleSheet, Button } from "react-native";
 import Constants from "expo-constants";
-import lrc from "../tests/lrc";
+import lrc from "../tests/yrc";
 
 // or any pure javascript modules available in npm
 import { Lrc, KaraokeMode } from "react-native-lyric";
@@ -24,7 +25,7 @@ export default function App() {
         currentTime={currentMillisecond}
         autoScroll
         autoScrollAfterUserScroll={500}
-        karaokeMode={KaraokeMode.NoKaraoke}
+        karaokeMode={KaraokeMode.Karaoke}
         onPress={console.log}
         onLinePress={console.log}
         activeFontSize={20}
