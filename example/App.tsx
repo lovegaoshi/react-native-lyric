@@ -2,7 +2,7 @@
 
 import { Text, View, StyleSheet, Button } from "react-native";
 import Constants from "expo-constants";
-import lrc from "../tests/krc";
+import lrc from "../tests/lrc";
 
 // or any pure javascript modules available in npm
 import { Lrc, KaraokeMode } from "react-native-lyric";
@@ -24,10 +24,10 @@ export default function App() {
         currentTime={currentMillisecond}
         autoScroll
         autoScrollAfterUserScroll={500}
-        karaokeMode={KaraokeMode.OnlyRealKaraoke}
+        karaokeMode={KaraokeMode.NoKaraoke}
         onPress={console.log}
         onLinePress={console.log}
-        activeFontSize={18}
+        activeFontSize={20}
       />
     </View>
   );
