@@ -5,6 +5,7 @@ import {
   ScrollView,
   ScrollViewProps,
   StyleProp,
+  View,
   ViewStyle,
 } from "react-native";
 import {
@@ -271,29 +272,31 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   };
 
   return (
-    <LegendList
-      {...props}
-      data={lrcLineList}
-      renderItem={
-        karaokeMode === KaraokeMode.NoKaraoke
-          ? renderStandardLine
-          : (info: LegendListRenderItemProps<LrcLine>) =>
-              determineKaraokeMode(info.item, info.index)
-      }
-      keyExtractor={(item: LrcLine) => item.id}
-      showsVerticalScrollIndicator={false}
-      ref={lrcRef}
-      scrollEventThrottle={30}
-      style={{ flex: 1 }}
-      contentContainerStyle={{
-        paddingTop: autoScroll ? height * 0.45 : 0,
-        paddingBottom: autoScroll ? height * 0.5 : 0,
-      }}
-      estimatedItemSize={lineHeight}
-      extraData={currentTime}
-      recycleItems={true}
-      renderScrollComponent={CustomScrollView}
-    />
+    <View style={[{ height }, style]}>
+      <LegendList
+        {...props}
+        data={lrcLineList}
+        renderItem={
+          karaokeMode === KaraokeMode.NoKaraoke
+            ? renderStandardLine
+            : (info: LegendListRenderItemProps<LrcLine>) =>
+                determineKaraokeMode(info.item, info.index)
+        }
+        keyExtractor={(item: LrcLine) => item.id}
+        showsVerticalScrollIndicator={false}
+        ref={lrcRef}
+        scrollEventThrottle={30}
+        style={{ flex: 1 }}
+        contentContainerStyle={{
+          paddingTop: autoScroll ? height * 0.45 : 0,
+          paddingBottom: autoScroll ? height * 0.5 : 0,
+        }}
+        estimatedItemSize={lineHeight}
+        extraData={currentTime}
+        recycleItems={true}
+        renderScrollComponent={CustomScrollView}
+      />
+    </View>
   );
 });
 
