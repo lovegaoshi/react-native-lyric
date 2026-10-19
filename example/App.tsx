@@ -26,7 +26,7 @@ export default function App() {
         autoScroll
         autoScrollAfterUserScroll={500}
         karaokeMode={KaraokeMode.Karaoke}
-        onPress={console.log}
+        onPress={() => console.log('window pressed')}
         onLinePress={console.log}
         activeFontSize={20}
       />

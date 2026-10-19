@@ -1,6 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, { useRef, useImperativeHandle, useEffect } from "react";
-import { Pressable, StyleProp, ViewStyle } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  ScrollViewProps,
+  StyleProp,
+  ViewStyle,
+} from "react-native";
 import {
   LegendList,
   LegendListRef,
@@ -256,31 +262,38 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     }
   };
 
+  const CustomScrollView = (props: ScrollViewProps) => {
+    return (
+      <ScrollView {...props}>
+        <Pressable onPress={onPress}>{props.children}</Pressable>
+      </ScrollView>
+    );
+  };
+
   return (
-    <Pressable style={[{ height }, style]} onPress={onPress}>
-      <LegendList
-        {...props}
-        data={lrcLineList}
-        renderItem={
-          karaokeMode === KaraokeMode.NoKaraoke
-            ? renderStandardLine
-            : (info: LegendListRenderItemProps<LrcLine>) =>
-                determineKaraokeMode(info.item, info.index)
-        }
-        keyExtractor={(item: LrcLine) => item.id}
-        showsVerticalScrollIndicator={false}
-        ref={lrcRef}
-        scrollEventThrottle={30}
-        style={{ flex: 1 }}
-        contentContainerStyle={{
-          paddingTop: autoScroll ? height * 0.45 : 0,
-          paddingBottom: autoScroll ? height * 0.5 : 0,
-        }}
-        estimatedItemSize={lineHeight}
-        extraData={currentTime}
-        recycleItems={true}
-      />
-    </Pressable>
+    <LegendList
+      {...props}
+      data={lrcLineList}
+      renderItem={
+        karaokeMode === KaraokeMode.NoKaraoke
+          ? renderStandardLine
+          : (info: LegendListRenderItemProps<LrcLine>) =>
+              determineKaraokeMode(info.item, info.index)
+      }
+      keyExtractor={(item: LrcLine) => item.id}
+      showsVerticalScrollIndicator={false}
+      ref={lrcRef}
+      scrollEventThrottle={30}
+      style={{ flex: 1 }}
+      contentContainerStyle={{
+        paddingTop: autoScroll ? height * 0.45 : 0,
+        paddingBottom: autoScroll ? height * 0.5 : 0,
+      }}
+      estimatedItemSize={lineHeight}
+      extraData={currentTime}
+      recycleItems={true}
+      renderScrollComponent={CustomScrollView}
+    />
   );
 });
 
