@@ -1,13 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useRef, useImperativeHandle, useEffect, useMemo } from "react";
+import React, { useRef, useImperativeHandle, useEffect } from "react";
+import { Pressable, StyleProp, ViewStyle } from "react-native";
 import {
-  ScrollView,
-  StyleProp,
-  View,
-  ViewStyle,
-  Pressable,
-  ScrollViewInstance,
-} from "react-native";
+  LegendList,
+  LegendListRef,
+  LegendListRenderItemProps,
+} from "@legendapp/list/react-native";
 
 import {
   LrcLine,
@@ -23,7 +21,6 @@ import {
 } from "./LrcLine";
 import { RealKaraokeLrcLine } from "./KLrcLine";
 import { FakeKaraokeLrcLine } from "./FakeKLrcLine";
-import { execWhenTrue } from "../util/utils";
 import type { LrcCommonProps } from "./LrcProps";
 
 interface Props extends LrcCommonProps {
@@ -98,7 +95,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   activeLineHeight *= fontScale;
   fontSize *= fontScale;
   activeFontSize *= fontScale;
-  const lrcRef = useRef<ScrollViewInstance>(null);
+  const lrcRef = useRef<LegendListRef>(null);
   const lrcLineList = useLrc(lrc, showUnformatted);
   const lrcHeights = useRef<number[]>([]);
   const scrolled = useRef(false);
@@ -110,28 +107,16 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     karaokeWidths.current = [undefined];
   }, [currentIndex]);
 
-  const scrollToReal = () =>
-    lrcRef.current?.scrollTo({
-      y: lrcHeights.current[currentIndex] - height / 2,
-      animated: true,
-    });
-
-  const scrollToFake = () =>
-    lrcRef.current?.scrollTo({
-      y: currentIndex * lineHeight || 0,
-      animated: true,
-    });
-
-  // auto scroll
+  // auto scroll: keep the active line vertically centered in the viewport.
   useEffect(() => {
     if (autoScroll && scrolled.current === false && currentIndex > 0) {
-      execWhenTrue({
-        loopCheck: async () => lrcHeights.current[currentIndex] !== undefined,
-        executeFn: scrollToReal,
-        catchFn: scrollToFake,
+      lrcRef.current?.scrollToIndex({
+        index: currentIndex,
+        animated: true,
+        viewPosition: 0.5,
       });
     }
-  }, [currentIndex, lineHeight]);
+  }, [currentIndex, lineHeight, autoScroll, height]);
 
   // on current line change
   useEffect(() => {
@@ -148,30 +133,27 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     }),
   }));
 
-  const lyricNodeList = useMemo(
-    () =>
-      lrcLineList.map((lrcLine, index) => (
-        <MemoStandardLine
-          lapsedAsActiveColor={lapsedAsActiveColor}
-          fontSize={fontSize}
-          activeFontSize={activeFontSize}
-          align={align}
-          fontScale={fontScale}
-          key={`${lrcLine.id}.standard.${index}`}
-          lrcLine={lrcLine}
-          index={index}
-          currentIndex={currentIndex}
-          activeLineHeight={activeLineHeight}
-          lineHeight={lineHeight}
-          karaokeOnColor={karaokeOnColor}
-          karaokeOffColor={karaokeOffColor}
-          lineRenderer={lineRenderer}
-          onViewLayout={(e) =>
-            (lrcHeights.current[index] = e.nativeEvent.layout.y)
-          }
-        />
-      )),
-    [activeLineHeight, currentIndex, lineHeight, lineRenderer, lrcLineList],
+  const renderStandardLine = ({
+    item: lrcLine,
+    index,
+  }: LegendListRenderItemProps<LrcLine>) => (
+    <MemoStandardLine
+      lapsedAsActiveColor={lapsedAsActiveColor}
+      fontSize={fontSize}
+      activeFontSize={activeFontSize}
+      align={align}
+      fontScale={fontScale}
+      key={`${lrcLine.id}.standard.${index}`}
+      lrcLine={lrcLine}
+      index={index}
+      currentIndex={currentIndex}
+      activeLineHeight={activeLineHeight}
+      lineHeight={lineHeight}
+      karaokeOnColor={karaokeOnColor}
+      karaokeOffColor={karaokeOffColor}
+      lineRenderer={lineRenderer}
+      onViewLayout={(e) => (lrcHeights.current[index] = e.nativeEvent.layout.y)}
+    />
   );
 
   const determineKaraokeMode = (lrcLine: LrcLine, index: number) => {
@@ -274,46 +256,31 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     }
   };
 
-  /**
-   * need to investigate wtf is going on.
-   * on a scrollTo event, momentumBegin is called; then onScroll; then nothing else.
-   * on a scroll vent, scrollBegin is called, then momentumEnd. 
-   * if either momentum events are registered, pressable wont work until momentumEnd 
-   * emits (via manual scrolling)
-   * TODO: retest this in RN 0.79
-   * 
-      onScrollBeginDrag={(e) => console.log("scroll begin ", e.nativeEvent)}
-      onScrollEndDrag={(e) => console.log("scroll end ", e.nativeEvent)}
-      onMomentumScrollBegin={(e) =>
-        console.log("momentum begin ", e.nativeEvent)
-      }
-      onMomentumScrollEnd={(e) => console.log("momentum end", e.nativeEvent)}
-
-
-      onScrollBeginDrag={() => (scrolled.current = true)}
-      onScrollEndDrag={() => (scrolled.current = false)}
-      onMomentumScrollEnd={() => (scrolled.current = false)}
-   */
   return (
-    <ScrollView
-      {...props}
-      showsVerticalScrollIndicator={false}
-      ref={lrcRef}
-      scrollEventThrottle={30}
-      style={[style, { height }]}
-    >
-      <Pressable style={{ flex: 1 }} onPress={onPress}>
-        {autoScroll ? (
-          <View style={{ width: "100%", height: 0.45 * height }} />
-        ) : null}
-        {karaokeMode === KaraokeMode.NoKaraoke
-          ? lyricNodeList
-          : lrcLineList.map(determineKaraokeMode)}
-        {autoScroll ? (
-          <View style={{ width: "100%", height: 0.5 * height }} />
-        ) : null}
-      </Pressable>
-    </ScrollView>
+    <Pressable style={[{ height }, style]} onPress={onPress}>
+      <LegendList
+        {...props}
+        data={lrcLineList}
+        renderItem={
+          karaokeMode === KaraokeMode.NoKaraoke
+            ? renderStandardLine
+            : (info: LegendListRenderItemProps<LrcLine>) =>
+                determineKaraokeMode(info.item, info.index)
+        }
+        keyExtractor={(item: LrcLine) => item.id}
+        showsVerticalScrollIndicator={false}
+        ref={lrcRef}
+        scrollEventThrottle={30}
+        style={{ flex: 1 }}
+        contentContainerStyle={{
+          paddingTop: autoScroll ? height * 0.45 : 0,
+          paddingBottom: autoScroll ? height * 0.5 : 0,
+        }}
+        estimatedItemSize={lineHeight}
+        extraData={currentTime}
+        recycleItems={true}
+      />
+    </Pressable>
   );
 });
 
