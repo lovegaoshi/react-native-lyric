@@ -104,8 +104,9 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   const lrcRef = useRef<LegendListRef>(null);
   const lrcLineList = useLrc(lrc, showUnformatted);
   const lrcHeights = useRef<number[]>([]);
-  const scrolled = useRef(false);
   const [scrollViewHeight, setScrollViewHeight] = useState(0);
+  const renderedOnce = useRef(false);
+  const [rendered, setRendered] = useState(false);
 
   const currentIndex = useCurrentIndex({ lrcLineList, currentTime });
   const karaokeWidths = useRef<Array<number | undefined>>([undefined]);
@@ -116,14 +117,14 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
 
   // auto scroll: keep the active line vertically centered in the viewport.
   useEffect(() => {
-    if (autoScroll && scrolled.current === false && currentIndex > 0) {
-      const func = () =>
+    if (autoScroll && currentIndex > 0) {
+      const func = async () =>
         lrcRef.current?.scrollToIndex({
           index: currentIndex,
           animated: true,
           viewPosition: 0.5,
-        });
-      func?.()?.then(func);
+        }) ?? setRendered(true);
+      func().then(() => func().then(() => setRendered(true)));
     }
   }, [currentIndex, lineHeight, autoScroll, height]);
 
@@ -269,7 +270,16 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     return (
       <ScrollView {...props}>
         <Pressable
-          onLayout={(e) => setScrollViewHeight(e.nativeEvent.layout.height)}
+          onLayout={(e) => {
+            setScrollViewHeight(e.nativeEvent.layout.height);
+            if (renderedOnce.current) {
+              if (currentIndex === 0 || !autoScroll) {
+                setRendered(true);
+              }
+            } else {
+              renderedOnce.current = true;
+            }
+          }}
           onPress={onPress}
         >
           {props.children}
@@ -280,7 +290,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
 
   return (
     <Pressable
-      style={[{ height }, style]}
+      style={[{ height, opacity: rendered ? 1 : 0 }, style]}
       onPress={scrollViewHeight < height ? onPress : undefined}
     >
       <LegendList
