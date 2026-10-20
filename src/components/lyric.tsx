@@ -1,11 +1,10 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useRef, useImperativeHandle, useEffect } from "react";
+import React, { useRef, useImperativeHandle, useEffect, useState } from "react";
 import {
   Pressable,
   ScrollView,
   ScrollViewProps,
   StyleProp,
-  View,
   ViewStyle,
 } from "react-native";
 import {
@@ -106,6 +105,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   const lrcLineList = useLrc(lrc, showUnformatted);
   const lrcHeights = useRef<number[]>([]);
   const scrolled = useRef(false);
+  const [scrollViewHeight, setScrollViewHeight] = useState(0);
 
   const currentIndex = useCurrentIndex({ lrcLineList, currentTime });
   const karaokeWidths = useRef<Array<number | undefined>>([undefined]);
@@ -123,7 +123,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
           animated: true,
           viewPosition: 0.5,
         });
-      func?.()?.then?.(func);
+      func?.()?.then(func);
     }
   }, [currentIndex, lineHeight, autoScroll, height]);
 
@@ -268,13 +268,21 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   const CustomScrollView = (props: ScrollViewProps) => {
     return (
       <ScrollView {...props}>
-        <Pressable onPress={onPress}>{props.children}</Pressable>
+        <Pressable
+          onLayout={(e) => setScrollViewHeight(e.nativeEvent.layout.height)}
+          onPress={onPress}
+        >
+          {props.children}
+        </Pressable>
       </ScrollView>
     );
   };
 
   return (
-    <View style={[{ height }, style]}>
+    <Pressable
+      style={[{ height }, style]}
+      onPress={scrollViewHeight < height ? onPress : undefined}
+    >
       <LegendList
         {...props}
         data={lrcLineList}
@@ -298,7 +306,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
         recycleItems={true}
         renderScrollComponent={CustomScrollView}
       />
-    </View>
+    </Pressable>
   );
 });
 
