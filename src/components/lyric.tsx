@@ -28,6 +28,10 @@ import {
 import { RealKaraokeLrcLine } from "./KLrcLine";
 import { FakeKaraokeLrcLine } from "./FakeKLrcLine";
 import type { LrcCommonProps } from "./LrcProps";
+import Animated, {
+  useAnimatedStyle,
+  withTiming,
+} from "react-native-reanimated";
 
 interface Props extends LrcCommonProps {
   /** lrc string */
@@ -59,6 +63,7 @@ interface Props extends LrcCommonProps {
   karaokeOffColor?: string;
   karaokeMode?: KaraokeMode;
   lapsedAsActiveColor?: boolean;
+  scrollToViewPosition?: number;
   [key: string]: any;
 }
 
@@ -93,6 +98,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     lineHeight = fontSize + 14,
     activeLineHeight = activeFontSize + 14,
     lapsedAsActiveColor,
+    scrollToViewPosition = 0.5,
     ...props
   }: Props,
   ref,
@@ -122,7 +128,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
         lrcRef.current?.scrollToIndex({
           index: currentIndex,
           animated: true,
-          viewPosition: 0.5,
+          viewPosition: scrollToViewPosition,
         }) ?? setRendered(true);
       func().then(() => func().then(() => setRendered(true)));
     }
@@ -288,35 +294,41 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     );
   };
 
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: withTiming(rendered ? 1 : 0, { duration: 200 }),
+  }));
+
   return (
-    <Pressable
-      style={[{ height, opacity: rendered ? 1 : 0 }, style]}
-      onPress={scrollViewHeight < height ? onPress : undefined}
-    >
-      <LegendList
-        {...props}
-        data={lrcLineList}
-        renderItem={
-          karaokeMode === KaraokeMode.NoKaraoke
-            ? renderStandardLine
-            : (info: LegendListRenderItemProps<LrcLine>) =>
-                determineKaraokeMode(info.item, info.index)
-        }
-        keyExtractor={(item: LrcLine) => item.id}
-        showsVerticalScrollIndicator={false}
-        ref={lrcRef}
-        scrollEventThrottle={30}
-        style={{ flex: 1 }}
-        contentContainerStyle={{
-          paddingTop: autoScroll ? height * 0.45 : 0,
-          paddingBottom: autoScroll ? height * 0.5 : 0,
-        }}
-        estimatedItemSize={lineHeight}
-        extraData={currentTime}
-        recycleItems={true}
-        renderScrollComponent={CustomScrollView}
-      />
-    </Pressable>
+    <Animated.View style={animatedStyle}>
+      <Pressable
+        style={[{ height }, style]}
+        onPress={scrollViewHeight < height ? onPress : undefined}
+      >
+        <LegendList
+          {...props}
+          data={lrcLineList}
+          renderItem={
+            karaokeMode === KaraokeMode.NoKaraoke
+              ? renderStandardLine
+              : (info: LegendListRenderItemProps<LrcLine>) =>
+                  determineKaraokeMode(info.item, info.index)
+          }
+          keyExtractor={(item: LrcLine) => item.id}
+          showsVerticalScrollIndicator={false}
+          ref={lrcRef}
+          scrollEventThrottle={30}
+          style={{ flex: 1 }}
+          contentContainerStyle={{
+            paddingTop: autoScroll ? height * 0.45 : 0,
+            paddingBottom: autoScroll ? height * 0.5 : 0,
+          }}
+          estimatedItemSize={lineHeight}
+          extraData={currentTime}
+          recycleItems={true}
+          renderScrollComponent={CustomScrollView}
+        />
+      </Pressable>
+    </Animated.View>
   );
 });
 
