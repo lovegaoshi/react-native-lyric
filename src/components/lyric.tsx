@@ -123,7 +123,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
 
   // auto scroll: keep the active line vertically centered in the viewport.
   useEffect(() => {
-    if (autoScroll && currentIndex > 0) {
+    if (autoScroll) {
       const func = async () =>
         lrcRef.current?.scrollToIndex({
           index: currentIndex,
