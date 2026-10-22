@@ -25,10 +25,11 @@ export default function App() {
         currentTime={currentMillisecond}
         autoScroll
         autoScrollAfterUserScroll={500}
-        karaokeMode={KaraokeMode.Karaoke}
+        karaokeMode={KaraokeMode.OnlyRealKaraoke}
         onPress={() => console.log('window pressed')}
         onLinePress={console.log}
-        activeFontSize={20}
+        activeFontSize={22}
+        fontSize={20}
       />
     </View>
   );

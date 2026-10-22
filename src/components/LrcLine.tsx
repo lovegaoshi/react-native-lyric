@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -29,23 +29,10 @@ export const DefaultLineRenderer = ({
   hidden = false,
   align = "center",
   fontSize = 14,
-  activeFontSize = 16,
-  currentFontSize = fontSize,
   lineHeight,
 }: LineRendererProps) => {
-  const animatedFontSize = useSharedValue(currentFontSize);
-  React.useEffect(() => {
-    animatedFontSize.value = withTiming(active ? activeFontSize : fontSize, {
-      duration: 200,
-    });
-  }, [active]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    fontSize: animatedFontSize.value,
-  }));
-
   return (
-    <Animated.Text
+    <Text
       key={`${keyPrefix}.${index}`}
       onLayout={onLayout}
       style={[
@@ -57,12 +44,12 @@ export const DefaultLineRenderer = ({
           fontWeight: "400", //active ? "500" :
           position: hidden ? "absolute" : undefined,
           // width: "100%",
+          fontSize,
         },
-        animatedStyle,
       ]}
     >
       {content}
-    </Animated.Text>
+    </Text>
   );
 };
 
@@ -90,10 +77,11 @@ const StandardLrcLine = function standardLrcLine({
   onPress,
   fontScale,
   align = "center",
-  fontSize,
+  fontSize = 14,
   activeFontSize,
   lapsedAsActiveColor,
   lineHeight,
+  paddingHorizontal = fontSize,
 }: StandardLrcLineProps) {
   const isActiveColor = lapsedAsActiveColor
     ? currentIndex >= index
@@ -111,12 +99,30 @@ const StandardLrcLine = function standardLrcLine({
     lineHeight,
   };
 
+  const scaleRatio = (activeFontSize ?? 1.1) / (fontSize ?? 1);
+  const animatedFontSize = useSharedValue(
+    currentIndex === index + 1 ? scaleRatio : 1,
+  );
+  React.useEffect(() => {
+    animatedFontSize.value = withTiming(lrcProps.active ? scaleRatio : 1, {
+      duration: 200,
+    });
+  }, [lrcProps.active]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: animatedFontSize.value }],
+  }));
+
   return (
-    <View
-      style={{
-        flexDirection: "row",
-        justifyContent: align === "center" ? "center" : undefined,
-      }}
+    <Animated.View
+      style={[
+        {
+          flexDirection: "row",
+          justifyContent: align === "center" ? "center" : undefined,
+          paddingHorizontal,
+        },
+        animatedStyle,
+      ]}
       onLayout={onViewLayout}
     >
       <Pressable
@@ -140,7 +146,7 @@ const StandardLrcLine = function standardLrcLine({
             )
           : lineRenderer(lrcProps)}
       </Pressable>
-    </View>
+    </Animated.View>
   );
 };
 

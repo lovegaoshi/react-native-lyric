@@ -2,6 +2,10 @@
 import React from "react";
 import { View } from "react-native";
 import MaskedView from "@react-native-masked-view/masked-view";
+import Animated, {
+  useAnimatedStyle,
+  withTiming,
+} from "react-native-reanimated";
 
 import type { LrcLine } from "../constant";
 import type { LineRendererProps } from "./LrcLine";
@@ -47,9 +51,10 @@ export const FakeKaraokeLrcLine = ({
   karaokeOnColor,
   fontScale,
   align,
-  fontSize,
+  fontSize = 14,
   activeFontSize,
   lineHeight,
+  paddingHorizontal = fontSize,
 }: Props) => {
   const karaokeProgress = calculateKaraokeLrcLineProgress({
     currentIndex,
@@ -58,49 +63,62 @@ export const FakeKaraokeLrcLine = ({
     index,
   });
 
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      {
+        scale: withTiming((activeFontSize ?? 1.1) / (fontSize ?? 1), {
+          duration: 200,
+        }),
+      },
+    ],
+  }));
+
   return (
-    <MaskedView
-      onLayout={(e) => (lrcHeights.current[index] = e.nativeEvent.layout.y)}
-      key={lrcLine.id}
-      style={{
-        flex: 1,
-        flexDirection: "row",
-        height: activeLineHeight,
-      }}
-      maskElement={lineRenderer({
-        fontSize,
-        activeFontSize,
-        align,
-        fontScale,
-        lrcLine,
-        index,
-        active: true,
-        lineHeight,
-      })}
-    >
-      {lrcLine.duration ? (
-        <>
+    <Animated.View style={animatedStyle}>
+      <MaskedView
+        onLayout={(e) => (lrcHeights.current[index] = e.nativeEvent.layout.y)}
+        key={lrcLine.id}
+        style={{
+          flex: 1,
+          flexDirection: "row",
+          height: activeLineHeight,
+          paddingHorizontal,
+        }}
+        maskElement={lineRenderer({
+          fontSize,
+          activeFontSize,
+          align,
+          fontScale,
+          lrcLine,
+          index,
+          active: true,
+          lineHeight,
+        })}
+      >
+        {lrcLine.duration ? (
+          <>
+            <View
+              style={{
+                width: `${karaokeProgress * 100}%`,
+                backgroundColor: karaokeOnColor,
+              }}
+            />
+            <View
+              style={{
+                width: `${(1 - karaokeProgress) * 100}%`,
+                backgroundColor: karaokeOffColor,
+              }}
+            />
+          </>
+        ) : (
           <View
             style={{
-              width: `${karaokeProgress * 100}%`,
+              flex: 1,
               backgroundColor: karaokeOnColor,
             }}
           />
-          <View
-            style={{
-              width: `${(1 - karaokeProgress) * 100}%`,
-              backgroundColor: karaokeOffColor,
-            }}
-          />
-        </>
-      ) : (
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: karaokeOnColor,
-          }}
-        />
-      )}
-    </MaskedView>
+        )}
+      </MaskedView>
+    </Animated.View>
   );
 };

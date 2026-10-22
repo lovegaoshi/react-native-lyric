@@ -12,6 +12,10 @@ import {
   LegendListRef,
   LegendListRenderItemProps,
 } from "@legendapp/list/react-native";
+import Animated, {
+  useAnimatedStyle,
+  withTiming,
+} from "react-native-reanimated";
 
 import {
   LrcLine,
@@ -28,10 +32,6 @@ import {
 import { RealKaraokeLrcLine } from "./KLrcLine";
 import { FakeKaraokeLrcLine } from "./FakeKLrcLine";
 import type { LrcCommonProps } from "./LrcProps";
-import Animated, {
-  useAnimatedStyle,
-  withTiming,
-} from "react-native-reanimated";
 
 interface Props extends LrcCommonProps {
   /** lrc string */
