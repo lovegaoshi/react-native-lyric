@@ -113,7 +113,6 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   const lrcLineList = useLrc(lrc, showUnformatted);
   const lrcHeights = useRef<number[]>([]);
   const [scrollViewHeight, setScrollViewHeight] = useState(0);
-  const [renderedOnce, setRenderedOnce] = useState(false);
   const [rendered, setRendered] = useState(false);
 
   const currentIndex = useCurrentIndex({ lrcLineList, currentTime });
@@ -125,7 +124,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
 
   // auto scroll: keep the active line vertically centered in the viewport.
   useEffect(() => {
-    if (autoScroll && currentIndex > 0) {
+    if (autoScroll && currentIndex >= 0) {
       const func = async () =>
         lrcRef.current?.scrollToIndex({
           index: currentIndex,
@@ -135,14 +134,6 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
       func().then(() => func().then(() => setRendered(true)));
     }
   }, [currentIndex, lineHeight, autoScroll, height]);
-
-  useEffect(() => {
-    // HACK: force lrc to render twice to check if content doesnt need scrolling by then
-    if (!renderedOnce) return;
-            if (currentIndex < 1 || !autoScroll) {
-                setRendered(true);
-            }
-  }, [renderedOnce]);
 
   // on current line change
   useEffect(() => {
@@ -291,10 +282,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     return (
       <ScrollView {...props}>
         <Pressable
-          onLayout={(e) => {
-            setScrollViewHeight(e.nativeEvent.layout.height);
-            setRenderedOnce(true);
-          }}
+          onLayout={(e) => setScrollViewHeight(e.nativeEvent.layout.height)}
           onPress={onPress}
         >
           {props.children}
