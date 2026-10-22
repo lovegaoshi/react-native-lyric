@@ -113,7 +113,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
   const lrcLineList = useLrc(lrc, showUnformatted);
   const lrcHeights = useRef<number[]>([]);
   const [scrollViewHeight, setScrollViewHeight] = useState(0);
-  const renderedOnce = useRef(false);
+  const [renderedOnce, setRenderedOnce] = useState(false);
   const [rendered, setRendered] = useState(false);
 
   const currentIndex = useCurrentIndex({ lrcLineList, currentTime });
@@ -285,12 +285,13 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
         <Pressable
           onLayout={(e) => {
             setScrollViewHeight(e.nativeEvent.layout.height);
-            if (renderedOnce.current) {
+            // HACK: force lrc to render twice to check if content doesnt need scrolling by then
+            if (renderedOnce) {
               if (currentIndex < 1 || !autoScroll) {
                 setRendered(true);
               }
             } else {
-              renderedOnce.current = true;
+              setRenderedOnce(true);
             }
           }}
           onPress={onPress}
