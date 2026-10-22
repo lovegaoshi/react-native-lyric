@@ -64,6 +64,7 @@ interface Props extends LrcCommonProps {
   karaokeMode?: KaraokeMode;
   lapsedAsActiveColor?: boolean;
   scrollToViewPosition?: number;
+  lyricPaddingHorizontal?: number;
   [key: string]: any;
 }
 
@@ -99,6 +100,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
     activeLineHeight = activeFontSize + 14,
     lapsedAsActiveColor,
     scrollToViewPosition = 0.5,
+    lyricPaddingHorizontal,
     ...props
   }: Props,
   ref,
@@ -123,7 +125,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
 
   // auto scroll: keep the active line vertically centered in the viewport.
   useEffect(() => {
-    if (autoScroll) {
+    if (autoScroll && currentIndex > 0) {
       const func = async () =>
         lrcRef.current?.scrollToIndex({
           index: currentIndex,
@@ -169,6 +171,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
       karaokeOffColor={karaokeOffColor}
       lineRenderer={lineRenderer}
       onViewLayout={(e) => (lrcHeights.current[index] = e.nativeEvent.layout.y)}
+      paddingHorizontal={lyricPaddingHorizontal}
     />
   );
 
@@ -193,6 +196,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
           (lrcHeights.current[index] = e.nativeEvent.layout.y)
         }
         onPress={onLinePress}
+        paddingHorizontal={lyricPaddingHorizontal}
       />
     );
 
@@ -211,6 +215,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
         lineRenderer={lineRenderer}
         karaokeOffColor={karaokeOffColor}
         karaokeOnColor={karaokeOnColor}
+        paddingHorizontal={lyricPaddingHorizontal}
       />
     );
 
@@ -237,6 +242,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
             onViewLayout={(e) =>
               (lrcHeights.current[index] = e.nativeEvent.layout.y)
             }
+            paddingHorizontal={lyricPaddingHorizontal}
           />
         ) : (
           defaultLine()
@@ -262,6 +268,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
               (lrcHeights.current[index] = e.nativeEvent.layout.y)
             }
             lineHeight={lineHeight}
+            paddingHorizontal={lyricPaddingHorizontal}
           />
         ) : (
           <FakeKaraokeLine />
@@ -279,7 +286,7 @@ const Lrc = React.forwardRef<LrcProps, Props>(function Lrc(
           onLayout={(e) => {
             setScrollViewHeight(e.nativeEvent.layout.height);
             if (renderedOnce.current) {
-              if (currentIndex === 0 || !autoScroll) {
+              if (currentIndex < 1 || !autoScroll) {
                 setRendered(true);
               }
             } else {
