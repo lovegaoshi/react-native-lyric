@@ -23,7 +23,7 @@ export default ({
         break;
       }
     }
-    setCurrentIndex(i - 1);
+    setCurrentIndex(Math.max(0, i - 1));
   }, [currentTime, lrcLineList]);
 
   return currentIndex;
