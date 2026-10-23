@@ -27,6 +27,7 @@
   "devDependencies": {
     "@react-native-community/eslint-config": "^2.0.0",
     "@react-native-masked-view/masked-view": "^0.3.1",
+    "@legendapp/list": "^3.6.0",
     "@types/jest": "^26.0.0",
     "@types/react": "18.3.20",
     "eslint": "^7.2.0",
@@ -46,7 +47,8 @@
     "react": "*",
     "react-native": "*",
     "react-native-reanimated": "*",
-    "react-native-worklets": "*"
+    "react-native-worklets": "*",
+    "@legendapp/list": "*"
   },
   "dependencies": {},
   "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"

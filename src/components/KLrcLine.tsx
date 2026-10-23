@@ -2,6 +2,10 @@
 import React, { useState } from "react";
 import { View } from "react-native";
 import MaskedView from "@react-native-masked-view/masked-view";
+import Animated, {
+  useAnimatedStyle,
+  withTiming,
+} from "react-native-reanimated";
 
 import { LrcLine, calcKaraokePercentage } from "../constant";
 import type { LineRendererProps } from "./LrcLine";
@@ -28,9 +32,10 @@ export const RealKaraokeLrcLine = ({
   onViewLayout,
   fontScale,
   align = "center",
-  fontSize,
+  fontSize = 14,
   activeFontSize,
   lineHeight,
+  paddingHorizontal = fontSize,
 }: KareokeProps) => {
   const [karaokeWidths, setKaraokeWidths] = useState<Array<number | undefined>>(
     [],
@@ -47,17 +52,31 @@ export const RealKaraokeLrcLine = ({
     color: "white",
   };
 
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      {
+        scale: withTiming((activeFontSize ?? 1.1) / (fontSize ?? 1), {
+          duration: 200,
+        }),
+      },
+    ],
+  }));
+
   return (
-    <View
+    <Animated.View
       onLayout={onViewLayout}
       key={lrcLine.id}
-      style={{
-        flexDirection: "row",
-        width: "100%",
-        justifyContent: align === "center" ? "center" : undefined,
-        flexWrap: "wrap",
-        alignItems: "flex-start",
-      }}
+      style={[
+        {
+          flexDirection: "row",
+          width: "100%",
+          justifyContent: align === "center" ? "center" : undefined,
+          flexWrap: "wrap",
+          alignItems: "flex-start",
+          paddingHorizontal,
+        },
+        animatedStyle,
+      ]}
     >
       {lrcLine.karaokeLines?.map((karaokeLine, karaokeIndex) => (
         <MaskedView
@@ -105,6 +124,6 @@ export const RealKaraokeLrcLine = ({
           hidden: karaokeWidths[0] !== undefined,
         }),
       )}
-    </View>
+    </Animated.View>
   );
 };
